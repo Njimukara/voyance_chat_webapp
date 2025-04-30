@@ -1,4 +1,4 @@
-# Voyance Chat Dashboard
+# Voyance Chat Webapp
 
 A modern, responsive dashboard for managing clients and seers in a real-time chat platform built with **Next.js**, **TypeScript**, **Tailwind CSS**, and **ShadCN UI**.
 
