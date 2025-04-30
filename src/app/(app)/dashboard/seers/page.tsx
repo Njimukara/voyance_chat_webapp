@@ -22,7 +22,9 @@ export default async function SeerProfilesPage() {
     return (
       <div className="p-4 md:p-6">
         <h1 className="text-3xl font-bold mb-6">Rencontrez Nos Voyants</h1>
-        <p>Aucun voyant trouvé pour le moment. 🙏</p>
+        <div className="flex items-center justify-center">
+          <p className="text-center">Aucun voyant trouvé pour le moment. 🙏</p>
+        </div>
       </div>
     );
   }
