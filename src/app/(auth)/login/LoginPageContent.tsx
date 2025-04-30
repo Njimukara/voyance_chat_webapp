@@ -39,9 +39,9 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"; // Get callback URL or default to dashboard
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(searchParams.get("error")); // Show error from query params
+  const [error, setError] = useState<string | null>(searchParams.get("error"));
   const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
@@ -56,13 +56,10 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     setError(null);
-    console.log("Tentative de connexion via NextAuth pour :", values.email);
 
     try {
-      // Use NextAuth's signIn function for credentials
-      // This will trigger the `authorize` function in your NextAuth config
       const result = await signIn("credentials", {
-        redirect: false, // Handle redirect manually based on result
+        redirect: false,
         email: values.email,
         password: values.password,
         callbackUrl,
@@ -71,36 +68,27 @@ export default function LoginPage() {
       console.log("Résultat signIn NextAuth :", result);
 
       if (result?.error) {
-        // Handle errors returned by NextAuth (including those from the authorize function)
-        // Map common NextAuth errors to user-friendly messages
         if (result.error === "CredentialsSignin") {
           setError("Email ou mot de passe incorrect.");
         } else if (result.error === "Callback") {
-          // Often indicates a config issue or problem during the callback phase
           setError("Une erreur de configuration est survenue.");
         } else {
-          setError(`Échec de la connexion: ${result.error}`); // Show specific error if available
+          setError(`Échec de la connexion: ${result.error}`);
         }
-        console.error("Erreur de connexion NextAuth :", result.error);
         toast({
           title: "Échec de la connexion",
           description: error ?? "Veuillez vérifier vos informations.",
           variant: "destructive",
         });
       } else if (result?.ok && !result.error) {
-        // Successful sign-in
-        console.log("Connexion réussie, redirection vers :", callbackUrl);
         toast({
           title: "Connexion réussie",
           description: "Redirection vers votre tableau de bord.",
           variant: "default",
         });
-        router.push(callbackUrl); // Redirect to the intended page or dashboard
-        // router.refresh(); // Optional: Refresh server components if needed
+        router.push(callbackUrl);
       } else {
-        // Handle unexpected cases where result is ok but no url or error
         setError("Une erreur inattendue s'est produite lors de la connexion.");
-        console.error("Résultat signIn NextAuth inattendu :", result);
         toast({
           title: "Erreur Inattendue",
           description: "Une erreur inattendue s'est produite.",
@@ -108,8 +96,6 @@ export default function LoginPage() {
         });
       }
     } catch (err) {
-      // Catch network errors or other unexpected issues during signIn call
-      console.error("La soumission de la connexion a échoué (catch) :", err);
       setError("Une erreur réseau ou inattendue s'est produite.");
       toast({
         title: "Erreur",

@@ -39,7 +39,9 @@ export default async function SeerProfilesPage() {
           >
             <CardHeader className="relative p-0">
               <Image
-                src={`https://source.unsplash.com/random/300x200/?portrait`}
+                src={`https://picsum.photos/300/200?random=${Math.floor(
+                  Math.random() * 1000
+                )}`}
                 alt={seer.name}
                 width={300}
                 height={200}

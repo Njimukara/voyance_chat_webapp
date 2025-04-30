@@ -19,6 +19,11 @@ import { CreditCard, Loader2, Coins } from "lucide-react"; // Added Coins icon
 import { fetchPlans } from "@/services/plans";
 import { usePlans } from "@/hooks/usePlans";
 import { LoadingLayout } from "@/components/ui/loading-layout";
+import { useSession } from "next-auth/react";
+import { CreditPackage } from "@/types/general";
+import ApiClient from "@/utils/axiosbase";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 // Replace with your actual PayPal Client ID
 const PAYPAL_CLIENT_ID =
@@ -33,97 +38,111 @@ interface CreditPlan {
 }
 
 export default function PurchaseCreditsPage() {
-  // Removed selectedPlan state as each plan has its own button
-  // const [selectedPlan, setSelectedPlan] = useState<CreditPlan | null>(null);
-  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null); // Track which plan is being processed
+  const { data: session } = useSession();
+  const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(
+    null
+  );
+  const [customOrderId, setCustomOrderId] = useState(null);
+  const [paypalOrderId, setPaypalOrderId] = useState(null);
+  const [message, setMessage] = useState("");
+  const [setError] = useState<string | null>(null);
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const { data: creditPlans, isLoading, error } = usePlans();
-  // Removed handlePlanSelect function
 
-  // PayPal Integration Functions - Adjusted to accept the specific plan
-  const createOrder = (
-    plan: CreditPlan | undefined,
-    data: any,
-    actions: any
-  ) => {
-    if (!plan) {
+  async function createOrder(data: any, actions: any) {
+    try {
+      if (!selectedPackage) {
+        return;
+      }
+
+      const payload = {
+        user: session?.user?.id,
+        plan_id: selectedPackage?.id,
+      };
+
+      try {
+        const response = await ApiClient.post(
+          "/api/plans/subscription/",
+          payload
+        );
+        setCustomOrderId(response.data.id);
+      } catch (backendError: any) {
+        console.error("Backend API failed:", backendError);
+        throw new Error(
+          backendError.response?.data ||
+            "Erreur lors de la création de la commande sur notre serveur"
+        );
+      }
+
+      const order = await actions.order.create({
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "EUR",
+              value: selectedPackage?.amount,
+            },
+          },
+        ],
+      });
+      setPaypalOrderId(order);
+      return order;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.detail ||
+          "Une erreur s'est produite lors de la création de la commande"
+      );
+    }
+  }
+
+  async function onApprove() {
+    try {
+      const payload = {
+        user: session?.user?.id,
+        plan_id: selectedPackage?.id,
+        transaction_id: paypalOrderId,
+      };
+
+      const response = await ApiClient.post(
+        `/api/plans/subscription/${customOrderId}/activate/`,
+        payload
+      );
+
       toast({
-        title: "Erreur",
-        description: "Plan de crédit sélectionné invalide.",
+        title: "Transaction Réussie",
+        description: `Transaction complétée par ${session?.user?.name}`,
+        variant: "default",
+      });
+      setMessage(`Transaction complétée par ${session?.user?.name}`);
+      toast({
+        title: "Erreur Inattendue",
+        description: `Transaction complétée par ${session?.user?.name}`,
         variant: "destructive",
       });
-      return Promise.reject(new Error("Plan invalide"));
-    }
-    setProcessingPlanId(plan.id); // Start loading state for the specific plan
-    console.log("Création de la commande PayPal pour :", plan);
-    return actions.order.create({
-      purchase_units: [
-        {
-          description: `Achat de ${plan.credit} crédits pour Voyance`,
-          amount: {
-            currency_code: "EUR", // Use Euro
-            value: plan.amount,
-          },
-          // Add custom_id or sku to identify the plan on backend if needed
-          // custom_id: plan.id,
-          // sku: plan.id,
-        },
-      ],
-      application_context: {
-        shipping_preference: "NO_SHIPPING", // No physical shipping needed
-      },
-    });
-  };
+      setTimeout(() => {
+        setSelectedPackage(null);
+      }, 3000);
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
 
-  const onApprove = async (
-    plan: CreditPlan | undefined,
-    data: any,
-    actions: any
-  ) => {
-    if (!plan) {
-      console.error("onApprove appelé sans plan valide.");
-      setProcessingPlanId(null); // End loading state
-      return; // Should not happen if createOrder succeeded
-    }
-    console.log("Commande PayPal approuvée, capture...", data);
-    // Capture the transaction
-    return actions.order
-      .capture()
-      .then((details: any) => {
-        console.log(
-          "Transaction complétée par " + details.payer.name.given_name
-        );
-        console.log("Détails de la commande :", details);
-        // --- Backend Integration ---
-        // Here you would typically:
-        // 1. Send the `details` (especially `details.id` and the `plan.id` or quantity purchased) to your backend.
-        // 2. Your backend verifies the transaction with PayPal using the order ID.
-        // 3. If verification is successful, your backend updates the user's credit balance in your database based on the purchased plan (`plan.credits`).
-        // 4. Optionally, send a confirmation email to the user.
-        // --- End Backend Integration ---
-
-        // Show success message to the user
-        toast({
-          title: "Achat Réussi !",
-          description: `Vous avez acheté ${plan.credit} crédits avec succès. Votre solde sera mis à jour sous peu.`,
-          variant: "default",
-        });
-
-        // Optionally, redirect or update UI state
-        setProcessingPlanId(null); // End loading state for this plan
-      })
-      .catch((error: any) => {
-        console.error("Échec de la capture PayPal :", error);
-        toast({
-          title: "Échec de l'Achat",
-          description:
-            "Un problème est survenu lors du traitement de votre paiement. Veuillez réessayer ou contacter le support.",
-          variant: "destructive",
-        });
-        setProcessingPlanId(null); // End loading state
+      setTimeout(() => {
+        router.push("/messages");
+      }, 3000);
+      return response.data?.id || "";
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data ||
+        "Une erreur est survenue lors de l'achat des crédits. Veuillez réessayer plus tard.";
+      toast({
+        title: "Erreur Inattendue",
+        description: errorMessage,
+        variant: "destructive",
       });
-  };
+    }
+  }
 
   const onError = (planId: string, err: any) => {
     console.error(`Erreur PayPal pour le plan ${planId} :`, err);
@@ -169,6 +188,29 @@ export default function PurchaseCreditsPage() {
   }
 
   if (isLoading) return <LoadingLayout />;
+
+  if (error) {
+    const isNetworkError = axios.isAxiosError(error) && !error.response;
+
+    return (
+      <div className="p-4 md:p-6 flex justify-center items-center h-full">
+        <Card className="max-w-md w-full shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-center text-destructive">
+              {isNetworkError ? "Erreur Réseau" : "Erreur de Chargement"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground">
+              {isNetworkError
+                ? "Vérifiez votre connexion Internet et réessayez."
+                : error?.message || "Impossible de charger les plans."}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     // Add padding here since it was removed from the main layout element
@@ -222,12 +264,8 @@ export default function PurchaseCreditsPage() {
                       label: "pay",
                       height: 40,
                     }}
-                    createOrder={(data, actions) =>
-                      createOrder(plan, data, actions)
-                    }
-                    onApprove={(data, actions) =>
-                      onApprove(plan, data, actions)
-                    }
+                    createOrder={(data, actions) => createOrder(data, actions)}
+                    onApprove={() => onApprove()}
                     onError={(err) => onError(plan.id, err)}
                     onCancel={(data) => onCancel(plan.id, data)}
                     disabled={!!processingPlanId}

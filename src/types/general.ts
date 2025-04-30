@@ -58,3 +58,19 @@ export function formatLastAction(lastAction: string | Date) {
   if (diffHours < 24) return `${diffHours} h`;
   return `${diffDays} j`;
 }
+
+export type CreditPackage = {
+  id: number;
+  features: string[];
+  created: string;
+  modified: string;
+  name: string;
+  amount: string;
+  max_products: number;
+  stripe_plan_id: string;
+  credit: number;
+};
+
+export interface SelectedUser {
+  name?: string | null;
+}
