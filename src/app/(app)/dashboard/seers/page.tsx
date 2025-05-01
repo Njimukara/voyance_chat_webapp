@@ -87,7 +87,7 @@ export default async function SeerProfilesPage() {
             <CardFooter className="p-4 pt-0">
               <Button className="w-full" size="sm" asChild>
                 {/* Link to a dynamic profile page or directly to chat */}
-                <Link href={`/dashboard/seers/${seer.id}`}>
+                <Link href={`/dashboard/chat/${seer.user}`}>
                   Voir Profil & Chatter
                 </Link>
               </Button>

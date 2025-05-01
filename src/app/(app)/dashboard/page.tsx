@@ -9,40 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  MessageSquare,
-  Users,
-  ShoppingCart,
-  Activity,
-  Coins,
-} from "lucide-react"; // Added Coins icon
+import { MessageSquare, Users, ShoppingCart, Coins } from "lucide-react"; // Added Coins icon
 import { useSession } from "next-auth/react";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  console.log("data", session);
-  // Mock data - replace with actual data fetching
-  const recentActivity = [
-    {
-      id: 1,
-      type: "chat",
-      description: "Chat commencé avec Mystic Maisie",
-      time: "Il y a 2 heures",
-    },
-    {
-      id: 2,
-      type: "purchase",
-      description: "Achat de 30 crédits",
-      time: "Il y a 1 jour",
-    }, // Changed to credits
-    {
-      id: 3,
-      type: "profile",
-      description: "Profil de Oracle Olivia consulté",
-      time: "Il y a 3 jours",
-    },
-  ];
-  const availableCredits = 45; // Example credits
 
   return (
     // Add padding here since it was removed from the main layout element
@@ -60,7 +31,7 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-2">
               <Button variant="outline" size="sm" asChild>
                 <Link
-                  href="/dashboard/chat"
+                  href="/dashboard/seers"
                   className="flex items-center gap-2"
                 >
                   <MessageSquare className="h-4 w-4" /> Démarrer un nouveau Chat

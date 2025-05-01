@@ -12,6 +12,7 @@ interface ChatMessagesProps {
   newMessageTrigger: number;
   localSentMessage?: Message | null; // <-- optional local message
   userType: UserType;
+  isNewClient: boolean;
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -20,6 +21,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   newMessageTrigger,
   localSentMessage,
   userType,
+  isNewClient,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,10 +54,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   };
 
   useEffect(() => {
-    if (selectedUser) {
+    if (selectedUser && !isNewClient) {
       fetchMessages(selectedUser.id);
+    } else {
+      setMessages([]);
     }
-  }, [selectedUser]);
+  }, [selectedUser, isNewClient]);
 
   useEffect(() => {
     if (selectedUser) {

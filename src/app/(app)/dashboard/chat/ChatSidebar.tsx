@@ -84,7 +84,7 @@ export function ChatSidebar({
                     </div>
 
                     {/* Status Text */}
-                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                    <div className="text-xs text-muted-foreground truncate max-w-[180px]">
                       {user.status === "online"
                         ? "En ligne"
                         : user.last_action
@@ -94,7 +94,7 @@ export function ChatSidebar({
 
                     {/* Last Message */}
                     {user.last_message && (
-                      <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                      <div className="text-xs text-muted-foreground truncate max-w-[250px] md:max-w-[180px] lg:max-w-[180px]">
                         {user.last_message}
                       </div>
                     )}

@@ -1,6 +1,7 @@
 export interface Seer {
   id: number;
   imageUrl: string;
+  user: string;
   name: string;
   rating: number;
   description: string;
