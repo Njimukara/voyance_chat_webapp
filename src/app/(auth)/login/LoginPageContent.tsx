@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,16 +21,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter, useSearchParams } from "next/navigation"; // Use next/navigation for App Router
-import { signIn } from "next-auth/react"; // Import signIn
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
-import { Loader2 } from "lucide-react"; // Import Loader2
-import { useToast } from "@/hooks/use-toast"; // Import useToast
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import ApiClient from "@/utils/axiosbase";
 
-// Zod schema for form validation
 const loginSchema = z.object({
   email: z.string().email({ message: "Adresse email invalide." }),
-  password: z.string().min(1, { message: "Le mot de passe est requis." }), // Basic validation
+  password: z.string().min(1, { message: "Le mot de passe est requis." }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -43,16 +42,16 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(searchParams.get("error"));
   const { toast } = useToast();
+  const { data: session } = useSession();
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema), // Use Zod resolver
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: searchParams.get("email") ?? "", // Pre-fill email if provided
+      email: searchParams.get("email") ?? "",
       password: "",
     },
   });
 
-  // Handle credentials login using NextAuth signIn
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     setError(null);
@@ -65,8 +64,6 @@ export default function LoginPage() {
         callbackUrl,
       });
 
-      console.log("Résultat signIn NextAuth :", result);
-
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
           setError("Email ou mot de passe incorrect.");
@@ -77,16 +74,23 @@ export default function LoginPage() {
         }
         toast({
           title: "Échec de la connexion",
-          description: error ?? "Veuillez vérifier vos informations.",
+          description: result.error ?? "Veuillez vérifier vos informations.",
           variant: "destructive",
         });
       } else if (result?.ok && !result.error) {
+        const userDetailsRes = await ApiClient.get(`/auth/users/me/`);
+        var usertype;
+        if (userDetailsRes.status == 200) {
+          usertype = userDetailsRes.data.user_profile.user_type;
+        }
         toast({
           title: "Connexion réussie",
           description: "Redirection vers votre tableau de bord.",
           variant: "default",
         });
-        router.push(callbackUrl);
+        // 1 == client
+        var url = usertype != 1 ? "/dashboard/chat" : callbackUrl;
+        router.push(url);
       } else {
         setError("Une erreur inattendue s'est produite lors de la connexion.");
         toast({
@@ -116,13 +120,12 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Display error message */}
         {error && (
           <div className="mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/30 text-destructive text-sm text-center">
             {error === "OAuthAccountNotLinked"
               ? "Cet email est déjà lié à un autre fournisseur. Essayez de vous connecter avec ce fournisseur."
               : error === "CredentialsSignin"
-              ? "Email ou mot de passe invalide." // Handled above now
+              ? "Email ou mot de passe invalide."
               : error}
           </div>
         )}

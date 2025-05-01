@@ -70,51 +70,6 @@ export default function DashboardPage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" /> Activité Récente
-          </CardTitle>
-          <CardDescription>
-            Vos dernières interactions sur la plateforme.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-3">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity) => (
-                <li
-                  key={activity.id}
-                  className="flex items-start gap-3 text-sm"
-                >
-                  <div className="mt-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-primary">
-                    {activity.type === "chat" && (
-                      <MessageSquare className="h-2.5 w-2.5" />
-                    )}
-                    {activity.type === "purchase" && (
-                      <ShoppingCart className="h-2.5 w-2.5" />
-                    )}
-                    {activity.type === "profile" && (
-                      <Users className="h-2.5 w-2.5" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.description}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </p>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Aucune activité récente trouvée.
-              </p>
-            )}
-          </ul>
-        </CardContent>
-      </Card> */}
     </div>
   );
 }
