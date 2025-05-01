@@ -1,10 +1,12 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "next-auth/react";
 import { SeerProvider } from "@/lib/SeerContext";
+import emailjs from "@emailjs/browser";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 const queryClient = new QueryClient();
 
@@ -13,14 +15,26 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
+  const initialOptions = {
+    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+    currency: "EUR",
+    intent: "capture",
+  };
+
+  useEffect(() => {
+    emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "");
+  }, []);
+
   return (
     <SessionProvider>
-      <SeerProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <Toaster />
-        </QueryClientProvider>
-      </SeerProvider>
+      <PayPalScriptProvider options={initialOptions}>
+        <SeerProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+            <Toaster />
+          </QueryClientProvider>
+        </SeerProvider>
+      </PayPalScriptProvider>
     </SessionProvider>
   );
 }
