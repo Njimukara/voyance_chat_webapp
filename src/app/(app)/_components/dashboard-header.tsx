@@ -63,6 +63,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const handleConfirmSwitch = () => {
     if (pendingSeeker) {
       // setSelectedSeeker(pendingSeeker);
+      // console.log(pendingSeeker);
       if (pendingSeeker) {
         setSelectedSeer(pendingSeeker); // ✨ updates context and localStorage
       }

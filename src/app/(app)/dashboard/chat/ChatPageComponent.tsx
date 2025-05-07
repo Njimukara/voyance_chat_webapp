@@ -73,7 +73,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
 
   const fetchClients = async () => {
     try {
-      const response = await ApiClient.get("/api/chat/seer/customers");
+      const response = await ApiClient.get("/api/chat/seer/customer");
       if (response.status === 200) {
         return response.data?.results;
       } else {
