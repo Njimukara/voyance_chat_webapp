@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserDTO } from "@/types/general";
 import { useToast } from "@/hooks/use-toast";
 import ApiClient from "@/utils/axiosbase";
+import { useSession } from "next-auth/react";
+import { sexOptions, topicOptions } from "@/utils/constants";
 
 export function SeerClientForm({ client }: { client: UserDTO }) {
+  const { data: session } = useSession();
+  const userId: number | undefined = session?.user?.id;
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: client.name || "",
@@ -14,6 +19,8 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
     customer_question: client.customer_question || "",
     soul_mate_birth_date: client.soul_mate_birth_date || "",
     concern: client.concern || "",
+    customer_id: client.id,
+    seer_admin_id: userId,
   });
 
   const { toast } = useToast();
@@ -52,7 +59,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
       });
       setFormData((prevData) => ({
         ...prevData,
-        soul_mate_birth_date: "", // Clear the field if invalid
+        soul_mate_birth_date: "",
       }));
     }
   };
@@ -61,7 +68,10 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
     e.preventDefault();
 
     try {
-      const response = await ApiClient.post("chat/seer/customers", formData);
+      const response = await ApiClient.post(
+        "/api/chat/seer/goal-create/",
+        formData
+      );
       if (
         !response.status.toString().startsWith("2") &&
         !response.status.toString().startsWith("3")
@@ -83,9 +93,40 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
     } finally {
       setLoading(false);
     }
-    // Logic to update the client details
-    console.log("Updated Client Data:", formData);
   };
+
+  useEffect(() => {
+    const fetchGoal = async () => {
+      const response = await ApiClient.get(
+        `/api/chat/seer/goal/?customer_id=${client?.id}`,
+        { validateStatus: () => true }
+      );
+
+      if (response.status === 200) {
+        setFormData((prev) => ({
+          ...prev,
+          ...response.data,
+        }));
+      } else if (
+        response.status === 404 &&
+        response.data.error === "No customer goal found"
+      ) {
+        // console.log("No goal found for this customer.");
+        // Optional: show soft message
+      } else {
+        toast({
+          title: "Erreur Inattendue",
+          description:
+            "Une erreur s’est produite lors de la récupération de l’objectif.",
+          variant: "destructive",
+        });
+      }
+
+      setLoading(false);
+    };
+
+    if (client?.id) fetchGoal();
+  }, [client?.id]);
 
   return (
     <Card className="w-80 border-l bg-card shrink-0 overflow-y-auto">
@@ -115,9 +156,12 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
               onChange={handleInputChange}
               className="w-full p-1 text-sm border rounded-md bg-background text-foreground focus:ring-2 focus:ring-accent focus:outline-none"
             >
-              <option value="">Sélectionner Sexe</option>{" "}
-              <option value="1">Homme</option>
-              <option value="2">Femme</option>
+              <option value="">Sélectionner Sexe</option>
+              {sexOptions.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -133,8 +177,25 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
             />
           </div>
           <div>
+            <label className="text-xs text-muted-foreground">Note client</label>
+            <select
+              className="w-full p-1 mt-1 text-sm border rounded-md bg-background text-foreground focus:ring-2 focus:ring-accent focus:outline-none"
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, concern: e.target.value }))
+              }
+              value={formData.concern}
+            >
+              <option value="">-- Sélectionnez un sujet --</option>
+              {topicOptions.map((topic) => (
+                <option key={topic.code} value={topic.code}>
+                  {topic.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className="text-xs text-muted-foreground">
-              Question du Client
+              Préoccupation du client
             </label>
             <textarea
               name="customer_question"
@@ -142,19 +203,6 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
               onChange={handleInputChange}
               className="w-full p-1 text-sm border rounded-md bg-background text-foreground focus:ring-2 focus:ring-accent focus:outline-none"
               placeholder="Décrire le problème du client"
-              rows={3}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">
-              Note du Client
-            </label>
-            <textarea
-              name="concern"
-              value={formData.concern}
-              onChange={handleInputChange}
-              className="w-full p-1 text-sm border rounded-md bg-background text-foreground focus:ring-2 focus:ring-accent focus:outline-none"
-              placeholder="Ajouter des notes sur le client"
               rows={3}
             />
           </div>
