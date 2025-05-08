@@ -13,13 +13,13 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
 
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: client.name || "",
-    email: client.email,
-    sex: client.sex || "",
-    customer_question: client.customer_question || "",
-    soul_mate_birth_date: client.soul_mate_birth_date || "",
-    concern: client.concern || "",
-    customer_id: client.id,
+    name: "",
+    email: "",
+    sex: "",
+    customer_question: "",
+    soul_mate_birth_date: "",
+    concern: "",
+    customer_id: 0,
     seer_admin_id: userId,
   });
 
@@ -96,6 +96,21 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
   };
 
   useEffect(() => {
+    if (client && userId) {
+      setFormData({
+        name: client.name || "",
+        email: client.email || "",
+        sex: client.sex || "",
+        customer_question: client.customer_question || "",
+        soul_mate_birth_date: client.soul_mate_birth_date || "",
+        concern: client.concern || "",
+        customer_id: client?.id,
+        seer_admin_id: userId,
+      });
+    }
+  }, [client, userId]);
+
+  useEffect(() => {
     const fetchGoal = async () => {
       const response = await ApiClient.get(
         `/api/chat/seer/goal/?customer_id=${client?.id}`,
@@ -126,7 +141,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
     };
 
     if (client?.id) fetchGoal();
-  }, [client?.id]);
+  }, [client]);
 
   return (
     <Card className="w-80 border-l bg-card shrink-0 overflow-y-auto">

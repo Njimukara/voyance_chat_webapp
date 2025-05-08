@@ -73,7 +73,9 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
 
   const fetchClients = async () => {
     try {
-      const response = await ApiClient.get("/api/chat/seer/customer");
+      const response = await ApiClient.get(
+        `/api/chat/seer/customers?seer_id=${selectedSeer?.id || userId}`
+      );
       if (response.status === 200) {
         return response.data?.results;
       } else {
@@ -240,6 +242,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
       setLoading(false);
     }
   };
+
   const fetchUpdatedUserDetails = async () => {
     try {
       const response = await ApiClient.get("/auth/users/me/");
