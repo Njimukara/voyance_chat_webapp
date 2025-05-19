@@ -1,18 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SendHorizonal } from "lucide-react";
-import { Toast } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { UserType } from "@/types/general";
 
 interface ChatInputProps {
   newMessage: string;
   setNewMessage: (value: string) => void;
   onSendMessage: (message: string) => void;
-  loading?: boolean; // Optional loading prop if you want
+  loading?: boolean;
+  userType: UserType;
 }
 
 const MIN_WORD_COUNT = 20;
@@ -22,6 +21,7 @@ export function ChatInput({
   setNewMessage,
   onSendMessage,
   loading,
+  userType,
 }: ChatInputProps) {
   const { toast } = useToast();
   const getWordCount = (text: string) =>
@@ -34,7 +34,7 @@ export function ChatInput({
     if (wordCount >= MIN_WORD_COUNT) {
       onSendMessage(newMessage);
       setNewMessage(""); // Clear input after sending
-    } else {
+    } else if (wordCount < MIN_WORD_COUNT && userType != "CLIENT") {
       toast({
         title: "Erreur Inattendue",
         description: `Le message doit contenir au moins ${MIN_WORD_COUNT} mots.`,
@@ -62,7 +62,7 @@ export function ChatInput({
         type="submit"
         size="icon"
         aria-label="Envoyer le message"
-        disabled={loading || getWordCount(newMessage) < MIN_WORD_COUNT}
+        disabled={loading}
       >
         <SendHorizonal className="h-4 w-4" />
       </Button>
