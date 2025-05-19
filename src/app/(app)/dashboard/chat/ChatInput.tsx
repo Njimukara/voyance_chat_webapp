@@ -31,10 +31,13 @@ export function ChatInput({
     e.preventDefault();
     const wordCount = getWordCount(newMessage);
 
-    if (wordCount >= MIN_WORD_COUNT) {
+    if (userType === "CLIENT") {
       onSendMessage(newMessage);
-      setNewMessage(""); // Clear input after sending
-    } else if (wordCount < MIN_WORD_COUNT && userType != "CLIENT") {
+      setNewMessage("");
+    } else if (wordCount >= MIN_WORD_COUNT) {
+      onSendMessage(newMessage);
+      setNewMessage("");
+    } else {
       toast({
         title: "Erreur Inattendue",
         description: `Le message doit contenir au moins ${MIN_WORD_COUNT} mots.`,

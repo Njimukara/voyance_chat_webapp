@@ -3,6 +3,7 @@ export interface Message {
   sender: number;
   body: string;
   creation_date: string;
+  reciever?: number;
 }
 
 export type UserDTO = {

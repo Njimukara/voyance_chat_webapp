@@ -267,6 +267,43 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }, [messages, userId, playNotification]);
 
+  /**
+   * Return the IDs of every seer whose most-recent exchange
+   * with the selected client ends with a client → seer message
+   * (i.e. still awaiting the seer’s reply).
+   */
+  // function getPendingSeerIdsFromMessages(
+  //   messages: Message[],
+  //   selectedClientId: number,
+  // ): number[] {
+  //   // latest message per seer, keyed by seerId
+  //   const latestPerSeer: Record<number, Message> = {};
+
+  //   for (const msg of messages) {
+  //     // ignore messages from other conversations
+  //     if (msg.sender !== selectedClientId && msg.reciever !== selectedClientId) {
+  //       continue;
+  //     }
+
+  //     // determine the seer involved in this conversation
+  //     const seerId =
+  //       msg.sender === selectedClientId ? msg.reciever : msg.senderId;
+
+  //     // keep only the newest message for that seer
+  //     const current = latestPerSeer[seerId];
+  //     if (!current || new Date(msg.timestamp) > new Date(current.timestamp)) {
+  //       latestPerSeer[seerId] = msg;
+  //     }
+  //   }
+
+  //   // a seer is “pending” iff the last message in the thread came FROM the client
+  //   return Object.values(latestPerSeer)
+  //     .filter((m) => m.senderId === selectedClientId)
+  //     .map((m) =>
+  //       m.senderId === selectedClientId ? m.receiverId : m.senderId,
+  //     );
+  // }
+
   return (
     <ScrollArea
       ref={scrollContainerRef}
