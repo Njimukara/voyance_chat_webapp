@@ -31,10 +31,19 @@ export function ChatInput({
     e.preventDefault();
     const wordCount = getWordCount(newMessage);
 
-    if (userType === "CLIENT") {
+    if (userType === "CLIENT" && wordCount > 1) {
       onSendMessage(newMessage);
       setNewMessage("");
-    } else if (wordCount >= MIN_WORD_COUNT) {
+    } else {
+      toast({
+        title: "Erreur Inattendue",
+        description: `Le message ne peut pas être vide.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (userType != "CLIENT" && wordCount >= MIN_WORD_COUNT) {
       onSendMessage(newMessage);
       setNewMessage("");
     } else {
@@ -43,6 +52,7 @@ export function ChatInput({
         description: `Le message doit contenir au moins ${MIN_WORD_COUNT} mots.`,
         variant: "destructive",
       });
+      return;
     }
   };
 

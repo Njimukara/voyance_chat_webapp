@@ -62,10 +62,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
   const handleConfirmSwitch = () => {
     if (pendingSeeker) {
-      // setSelectedSeeker(pendingSeeker);
-      // console.log(pendingSeeker);
       if (pendingSeeker) {
-        setSelectedSeer(pendingSeeker); // ✨ updates context and localStorage
+        setSelectedSeer(pendingSeeker);
       }
       localStorage.setItem("selectedSeeker", JSON.stringify(pendingSeeker));
     }
@@ -108,12 +106,9 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-      <SidebarTrigger className="sm:hidden" />{" "}
-      {/* Hamburger menu for mobile sidebar */}
-      {/* Right side - Seekers list (only if user is admin) */}
+      <SidebarTrigger className="sm:hidden" />
       {user?.isAdmin && seers.length > 0 && (
         <div className="flex items-center gap-2 ml-auto">
-          {/* Show loading spinner if still fetching seers */}
           {isLoading ? (
             <div className="w-5 h-5 border-4 border-t-4 border-primary rounded-full animate-spin"></div>
           ) : (
@@ -127,7 +122,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                     ? "bg-primary text-white border-primary"
                     : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
                 )}
-                // className="px-4 capitalize py-2 text-sm font-medium text-muted-foreground bg-background rounded-full border-2 border-transparent hover:bg-primary hover:text-white transition-colors"
                 onClick={() => handleSeekerClick(seer)}
               >
                 {seer.name}
@@ -136,8 +130,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           )}
         </div>
       )}
-      <div className="flex-1" /> {/* Spacer */}
-      {/* Left side - User info and dropdown */}
+      <div className="flex-1" />
       <div className="flex items-center gap-4 flex-grow-0">
         <div className="flex flex-col">
           <p className="text-sm font-medium">{user?.name ?? "Utilisateur"}</p>
@@ -149,12 +142,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           )}
         </div>
 
-        {/* Dropdown menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            {/* <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <UserIcon className="h-5 w-5" />
-            </Button> */}
             <Button
               variant="ghost"
               className="relative h-8 w-8 rounded-full p-0"
@@ -203,8 +192,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           handleConfirmSwitch();
         }}
         onClose={() => {
-          setPendingSeeker(null); // Reset the selected seeker when closing modal without confirming
-          setIsModalOpen(false); // Close the modal
+          setPendingSeeker(null);
+          setIsModalOpen(false);
         }}
         open={isModalOpen}
       />
