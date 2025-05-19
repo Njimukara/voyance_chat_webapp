@@ -14,7 +14,7 @@ interface ChatInputProps {
   userType: UserType;
 }
 
-const MIN_WORD_COUNT = 20;
+const MIN_WORD_COUNT = 10;
 
 export function ChatInput({
   newMessage,
