@@ -5,6 +5,7 @@ import { Message, UserDTO, UserType } from "@/types/general";
 import { useEffect, useRef, useState } from "react";
 import ApiClient from "@/utils/axiosbase";
 import { formatDateForAPI } from "@/utils/apiConfig";
+import { useNotificationSound } from "@/hooks/useNotificationSound";
 
 interface ChatMessagesProps {
   selectedUser: UserDTO | null;
@@ -36,6 +37,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   );
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [previousUrl, setPreviousUrl] = useState<string | null>(null);
+
+  /* ─────────── notification-sound bookkeeping ─────────── */
+  const playNotification = useNotificationSound();
+  const lastPlayedIdRef = useRef<number | null>(null);
+  const firstLoadRef = useRef(true);
 
   const getMessagesEndpoint = (
     id: number,
@@ -240,6 +246,26 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       scrollContainerRef.current;
     return scrollHeight - scrollTop - clientHeight < 100; // 100px tolerance
   };
+
+  /* ――― play sound when the OTHER user sends something new ――― */
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    const latest = messages[messages.length - 1];
+
+    // Skip on first historical load
+    if (firstLoadRef.current) {
+      firstLoadRef.current = false;
+      lastPlayedIdRef.current = latest.id;
+      return;
+    }
+
+    // Only notify if it's NOT you and we haven't played this one yet
+    if (latest.sender !== userId && latest.id !== lastPlayedIdRef.current) {
+      playNotification();
+      lastPlayedIdRef.current = latest.id;
+    }
+  }, [messages, userId, playNotification]);
 
   return (
     <ScrollArea

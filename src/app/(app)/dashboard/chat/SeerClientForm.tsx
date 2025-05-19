@@ -67,6 +67,20 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (
+      !formData.sex ||
+      !formData.soul_mate_birth_date ||
+      !formData.concern ||
+      !formData.customer_question
+    ) {
+      toast({
+        title: "Champs Obligatoires",
+        description: "Veuillez remplir tous les champs requis.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const response = await ApiClient.post(
         "/api/chat/seer/goal-create/",
@@ -152,7 +166,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
 
         <CardContent className="p-4 space-y-3">
           <div>
-            <label className="text-xs text-muted-foreground">Nom</label>
+            <label className="text-xs text-muted-foreground">Nom *</label>
             <input
               type="text"
               name="name"
@@ -164,7 +178,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
             />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Sexe</label>
+            <label className="text-xs text-muted-foreground">Sexe *</label>
             <select
               name="sex"
               value={formData.sex}
@@ -181,7 +195,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">
-              Date de Naissance du Partenaire
+              Date de Naissance du Partenaire *
             </label>
             <input
               type="date"
@@ -192,7 +206,9 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
             />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Note client</label>
+            <label className="text-xs text-muted-foreground">
+              Note client *
+            </label>
             <select
               className="w-full p-1 mt-1 text-sm border rounded-md bg-background text-foreground focus:ring-2 focus:ring-accent focus:outline-none"
               onChange={(e) =>
@@ -210,7 +226,7 @@ export function SeerClientForm({ client }: { client: UserDTO }) {
           </div>
           <div>
             <label className="text-xs text-muted-foreground">
-              Préoccupation du client
+              Préoccupation du client *
             </label>
             <textarea
               name="customer_question"
