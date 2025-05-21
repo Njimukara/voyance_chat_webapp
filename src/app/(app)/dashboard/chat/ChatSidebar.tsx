@@ -85,8 +85,8 @@ export function ChatSidebar({
 
                     {/* Status Text */}
                     <div className="text-xs text-muted-foreground truncate max-w-[180px]">
-                      {user.status === "online"
-                        ? "En ligne"
+                      {user.status === "active"
+                        ? ""
                         : user.last_action
                         ? `Vu il y a ${formatLastAction(user.last_action)}`
                         : "Hors ligne"}
