@@ -56,15 +56,34 @@ export default async function SeerProfilesPage() {
                   <AvatarImage src={seer.imageUrl} alt={seer.name} />
                   <AvatarFallback>{seer.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <CardTitle className="text-lg capitalize">
-                    {seer.name}
-                  </CardTitle>
-                  <div className="flex items-center gap-1 text-sm text-amber-400">
-                    {Array.from({ length: Math.round(seer.rating) }, (_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                    <span>{seer.rating.toFixed(1)}</span>
+
+                <div className="w-full flex justify-between align-center">
+                  <div>
+                    <CardTitle className="text-lg capitalize">
+                      {seer.name}
+                    </CardTitle>
+                    <div className="flex items-center gap-1 text-sm text-amber-400">
+                      {Array.from(
+                        { length: Math.round(seer.rating) },
+                        (_, i) => (
+                          <Star key={i} className="h-4 w-4 fill-current" />
+                        )
+                      )}
+                      <span>{seer.rating.toFixed(1)}</span>
+                    </div>
+                    <Badge variant="default" className="text-xs">
+                      {seer.level}
+                    </Badge>
+                  </div>
+
+                  <div className="flex gap-2 flex-col">
+                    <Badge variant="secondary" className="text-xs">
+                      {seer.domain}
+                    </Badge>
+
+                    <Badge variant="outline" className="text-xs">
+                      {seer.credit_per_message} credit/message
+                    </Badge>
                   </div>
                 </div>
               </div>

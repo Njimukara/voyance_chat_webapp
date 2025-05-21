@@ -3,9 +3,11 @@ export interface Seer {
   imageUrl: string;
   user: string;
   name: string;
+  level: string;
+  domain: string;
   rating: number;
   description: string;
-  pricePerMinute: number;
+  credit_per_message: number;
   specialties: Specialty[];
 }
 

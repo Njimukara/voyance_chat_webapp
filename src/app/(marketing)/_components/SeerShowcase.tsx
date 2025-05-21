@@ -78,20 +78,20 @@ const SeerShowcase = () => {
                 <div className="flex items-center gap-1 text-sm text-amber-400 mb-2">
                   <Star className="h-4 w-4 fill-current" />
                   <span>{seer.rating.toFixed(1)}</span>
+
+                  <div className="text-xs text-red-300">
+                    <Badge variant="default" className="text-xs">
+                      ** {seer.level} **
+                    </Badge>
+                  </div>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3 flex-grow px-2">
                   {seer.description}
                 </p>
                 <div className="flex flex-wrap justify-center gap-1 mb-4 capitalize">
-                  {seer?.specialties?.map((specialty: Specialty) => (
-                    <Badge
-                      key={specialty.id}
-                      variant="secondary"
-                      className="text-xs"
-                    >
-                      {specialty.name}
-                    </Badge>
-                  ))}
+                  <Badge variant="secondary" className="text-xs">
+                    {seer.domain}
+                  </Badge>
                 </div>
                 <Button
                   variant="outline"
@@ -103,6 +103,11 @@ const SeerShowcase = () => {
                     Connectez-vous avec {seer.name.split(" ")[0]}
                   </Link>
                 </Button>
+                <div className="flex flex-wrap justify-center gap-1 mt-4 capitalize">
+                  <Badge variant="outline" className="text-xs">
+                    {seer.credit_per_message} credit/message
+                  </Badge>
+                </div>
               </Card>
             ))
           ) : (
