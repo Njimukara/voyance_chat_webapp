@@ -36,8 +36,9 @@ interface DashboardHeaderProps {
 
 const fetchAllSeers = async () => {
   try {
-    const response = await ApiClient.get("/api/seers/");
+    const response = await ApiClient.get("/api/seers");
     if (response.status === 200) {
+      console.log(response.data.results);
       return response.data?.results;
     } else {
       throw new Error("Échec de la récupération des voyants");

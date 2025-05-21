@@ -48,6 +48,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     creationDate?: string | null,
     page: number = 1
   ) => {
+    console.log(userType, id);
     if (userType === "SEER") {
       return creationDate
         ? `/api/chat/seer/messages?customer_id=${id}&creationDate=${creationDate}`
@@ -156,7 +157,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         }
       }
     } catch (error) {
-      console.error("Error fetching messages", error);
+      // console.error("Error fetching messages", error);
     } finally {
       setLoading(false);
       if (!isPolling) setInitialLoading(false); // done loading if not polling

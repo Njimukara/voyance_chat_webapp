@@ -74,7 +74,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
   const fetchClients = async () => {
     try {
       const response = await ApiClient.get(
-        `/api/chat/seer/customers?seer_id=${selectedSeer?.id || userId}`
+        `/api/chat/seer/customers?seer_id=${selectedSeer?.user || userId}`
       );
       if (response.status === 200) {
         return response.data?.results;
@@ -182,13 +182,11 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     setLoading(true);
 
     try {
-      const storedSeeker = localStorage.getItem("selectedSeeker");
       let initialSenderId = 0;
 
-      if (storedSeeker) {
+      if (selectedSeer) {
         try {
-          const parsedSeeker = JSON.parse(storedSeeker);
-          initialSenderId = parsedSeeker?.id || 0;
+          initialSenderId = selectedSeer?.id || 0;
         } catch (error) {
           console.error("Failed to parse stored seeker", error);
         }
@@ -200,7 +198,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
         userType === "SEER"
           ? {
               body: inputMessage,
-              receiver: receiverId,
+              receiver: selectedUser.id,
               initialSender: initialSenderId,
               sender: userId,
             }
@@ -216,7 +214,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
       setLocalSentMessage(tempMessage);
 
       const response = await ApiClient.post(
-        sendMessageEndpoint(receiverId),
+        sendMessageEndpoint(selectedUser.id),
         payload
       );
       if (
