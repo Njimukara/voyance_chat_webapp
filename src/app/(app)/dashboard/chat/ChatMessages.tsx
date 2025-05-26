@@ -78,7 +78,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [newMessageTrigger]);
 
   useEffect(() => {
-    console.log("testign the loading after new messages");
+    // console.log("testign the loading after new messages");
     if (localSentMessage) {
       setMessages((prev) => [...prev, localSentMessage]);
 
