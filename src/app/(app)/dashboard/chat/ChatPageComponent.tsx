@@ -113,7 +113,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
   const { data: allSeers, isLoading: seersLoading } = useQuery({
     queryKey: ["allSeers"],
     queryFn: fetchAllSeers,
-    enabled: !!seerId, // Only fetch if there's a seerId
+    enabled: !!seerId,
     staleTime: 5 * 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
