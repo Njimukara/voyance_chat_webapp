@@ -114,7 +114,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryKey: ["allSeers"],
     queryFn: fetchAllSeers,
     enabled: !!seerId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 3 * 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;
@@ -131,8 +131,8 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryKey: ["clients", selectedSeer?.id],
     queryFn: fetchClients,
     enabled: userType === "SEER" || userType == "CLIENT",
-    staleTime: 3 * 60 * 1000,
-    refetchInterval: 4 * 60 * 1000,
+    staleTime: 1 * 60 * 1000,
+    refetchInterval: 1 * 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;

@@ -269,8 +269,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     // Only notify if it's NOT you and we haven't played this one yet
     if (
       latest.sender !== currentSenderId &&
-      latest.sender !== Number(selectedSeer?.user) &&
-      latest.id !== lastPlayedIdRef.current
+      latest.id !== lastPlayedIdRef.current &&
+      (selectedUser?.unread_message_count ?? 0) > 0
     ) {
       playNotification();
       lastPlayedIdRef.current = latest.id;
