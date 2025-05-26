@@ -71,6 +71,10 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     fetchUpdatedUserDetails();
   }, []);
 
+  useEffect(() => {
+    setSelectedUser(null);
+  }, [selectedSeer]);
+
   const fetchClients = async () => {
     try {
       const response = await ApiClient.get(
