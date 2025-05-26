@@ -132,7 +132,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryFn: fetchClients,
     enabled: userType === "SEER" || userType == "CLIENT",
     staleTime: 1 * 60 * 1000,
-    refetchInterval: 1 * 60 * 1000,
+    refetchInterval: 20 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;

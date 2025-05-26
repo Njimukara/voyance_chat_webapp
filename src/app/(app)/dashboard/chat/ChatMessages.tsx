@@ -75,6 +75,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   useEffect(() => {
     if (selectedUser) {
       fetchMessages(selectedUser.id, null, 1, true);
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [newMessageTrigger]);
 
@@ -86,6 +87,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       if (selectedUser && latestMessageDate) {
         fetchMessages(selectedUser.id, latestMessageDate, undefined, true);
       }
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [localSentMessage]);
 
@@ -95,7 +97,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     const interval = setInterval(async () => {
       if (!isUserAtBottom()) {
         // If user is NOT at bottom, fetch messages but don't auto-scroll
-        await fetchMessages(selectedUser.id, null, 1, false);
+        await fetchMessages(selectedUser.id, null, 1, true);
         setHasNewMessages(true); // <-- show 'new messages' indicator
       } else {
         // If user IS at bottom, fetch messages normally
@@ -174,9 +176,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const previousScrollHeightRef = useRef<number>(0);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // useEffect(() => {
+  //   bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [messages]);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
