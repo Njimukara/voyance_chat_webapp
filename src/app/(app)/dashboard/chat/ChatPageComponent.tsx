@@ -132,6 +132,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryFn: fetchClients,
     enabled: userType === "SEER" || userType == "CLIENT",
     staleTime: 3 * 60 * 1000,
+    refetchInterval: 4 * 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;
@@ -205,7 +206,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
               body: inputMessage,
               receiver: selectedUser.id,
               initialSender: initialSenderId,
-              sender: userId,
+              sender: selectedSeer?.id || userId,
             }
           : {
               body: inputMessage,
