@@ -81,7 +81,6 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
         `/api/chat/seer/customers?seer_id=${selectedSeer?.user || userId}`
       );
       if (response.status === 200) {
-        console.log(response.data.results);
         return response.data?.results;
       } else {
         throw new Error("Échec de la récupération des utilisateurs");
