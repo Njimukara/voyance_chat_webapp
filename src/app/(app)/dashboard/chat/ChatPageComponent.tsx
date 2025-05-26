@@ -213,7 +213,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
               sender: userId,
             };
 
-      const actualSender = Number(selectedSeer?.user ?? userId!);
+      const actualSender = Number(selectedSeer?.user) ?? userId!;
 
       const tempMessage = {
         id: Date.now(), // Temporary unique ID

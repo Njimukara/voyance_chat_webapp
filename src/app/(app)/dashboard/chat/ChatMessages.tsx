@@ -39,6 +39,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [previousUrl, setPreviousUrl] = useState<string | null>(null);
   const { selectedSeer } = useSeer();
+  const [currentSenderId, setCurrentSenderId] = useState<number>(userId ?? -1);
 
   /* ─────────── notification-sound bookkeeping ─────────── */
   const playNotification = useNotificationSound();
@@ -266,11 +267,23 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
 
     // Only notify if it's NOT you and we haven't played this one yet
-    if (latest.sender !== userId && latest.id !== lastPlayedIdRef.current) {
+    if (
+      latest.sender !== currentSenderId &&
+      latest.sender !== Number(selectedSeer?.user) &&
+      latest.id !== lastPlayedIdRef.current
+    ) {
       playNotification();
       lastPlayedIdRef.current = latest.id;
     }
   }, [messages, userId, playNotification]);
+
+  useEffect(() => {
+    if (selectedSeer?.user != null) {
+      setCurrentSenderId(Number(selectedSeer.user));
+    } else if (userId != null) {
+      setCurrentSenderId(userId);
+    }
+  }, [selectedSeer, userId]);
 
   return (
     <ScrollArea
@@ -302,12 +315,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <div
               key={message.id}
               className={`flex flex-col ${
-                message.sender === userId ? "items-end" : "items-start"
+                message.sender === currentSenderId ? "items-end" : "items-start"
               }`}
             >
               <div
                 className={`rounded-lg px-3 py-2 max-w-xs md:max-w-md break-words shadow-sm text-sm ${
-                  message.sender === userId
+                  message.sender === currentSenderId
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground"
                 }`}
