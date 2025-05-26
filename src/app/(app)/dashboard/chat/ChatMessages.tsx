@@ -69,7 +69,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     if (selectedUser && !isNewClient) {
       fetchMessages(selectedUser.id);
     } else {
-      setMessages([]);
+      // setMessages([]);
+      fetchMessages(selectedUser.id);
     }
   }, [selectedUser, isNewClient]);
 
