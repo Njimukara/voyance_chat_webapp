@@ -101,7 +101,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         // If user IS at bottom, fetch messages normally
         await fetchMessages(selectedUser.id, null, 1, true);
       }
-    }, 20000); // every 20 seconds
+    }, 10000); // every 20 seconds
 
     return () => clearInterval(interval); // cleanup
   }, [selectedUser]);
