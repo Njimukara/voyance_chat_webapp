@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
-  const user = session?.user;
   const userType: UserType = getUserRole(
     session?.user?.user_profile?.user_type
   );
