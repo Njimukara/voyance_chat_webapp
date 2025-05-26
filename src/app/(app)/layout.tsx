@@ -41,16 +41,12 @@ interface AppUser {
 }
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  // const user = { name: 'Jane Doe', email: 'jane@example.com', avatar: 'https://picsum.photos/seed/avatar1/40/40' }; // Mock user data
-  const session = await auth(); // Fetch session on the server
-  const user = session?.user as AppUser | undefined; // Get user from session, assert type
+  const session = await auth();
+  const user = session?.user as AppUser | undefined;
   const userType: UserType = getUserRole(
     session?.user?.user_profile?.user_type
   );
 
-  const isClient = userType === "CLIENT";
-  // If no user session, optionally redirect or show a different state
-  // For now, we rely on middleware to protect this layout
   if (!user) {
     // This should ideally not be reached if middleware is set up correctly
     // You could redirect here as a fallback, but middleware is preferred
@@ -96,14 +92,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </SidebarHeader>
         <SidebarContent className="pl-4 pt-4">
           <SidebarMenu>
-            {/* <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Tableau de Bord">
-                <Link href="/dashboard">
-                  <LayoutDashboard />
-                  <span>Tableau de Bord</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Chat">
                 <Link href="/dashboard/chat">
@@ -163,7 +151,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <SidebarMenu>
             <SidebarMenuItem>
-              {/* Use SignOutButton component */}
               <SignOutButton />
             </SidebarMenuItem>
           </SidebarMenu>

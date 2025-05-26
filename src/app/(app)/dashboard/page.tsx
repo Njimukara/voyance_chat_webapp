@@ -11,9 +11,22 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { MessageSquare, Users, ShoppingCart, Coins } from "lucide-react"; // Added Coins icon
 import { useSession } from "next-auth/react";
+import { UserType } from "@/types/general";
+import { getUserRole } from "@/utils/apiConfig";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const user = session?.user;
+  const userType: UserType = getUserRole(
+    session?.user?.user_profile?.user_type
+  );
+
+  const router = useRouter();
+
+  if (userType != "CLIENT") {
+    router.replace("/dashboard/chat");
+  }
 
   return (
     // Add padding here since it was removed from the main layout element
@@ -55,6 +68,7 @@ export default function DashboardPage() {
               </Button>
             </div>
           </div>
+          {}
           <div className="p-4 border rounded-lg bg-muted/40 flex flex-col justify-center items-center text-center">
             <h3 className="text-lg font-semibold mb-2">Crédits Disponibles</h3>
             <p className="text-4xl font-bold text-primary flex items-center gap-2">

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import ApiClient from "@/utils/axiosbase";
 import { formatDateForAPI } from "@/utils/apiConfig";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
+import { useSeer } from "@/lib/SeerContext";
 
 interface ChatMessagesProps {
   selectedUser: UserDTO | null;
@@ -37,6 +38,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   );
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [previousUrl, setPreviousUrl] = useState<string | null>(null);
+  const { selectedSeer } = useSeer();
 
   /* ─────────── notification-sound bookkeeping ─────────── */
   const playNotification = useNotificationSound();
@@ -48,11 +50,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     creationDate?: string | null,
     page: number = 1
   ) => {
-    console.log(userType, id);
     if (userType === "SEER") {
       return creationDate
-        ? `/api/chat/seer/messages?customer_id=${id}&creationDate=${creationDate}`
-        : `/api/chat/seer/messages?customer_id=${id}&page=${page}`;
+        ? `/api/chat/seer/messages?customer_id=${id}&seer_id=${
+            selectedSeer?.user || userId
+          }&creationDate=${creationDate}`
+        : `/api/chat/seer/messages?customer_id=${id}&seer_id=${
+            selectedSeer?.user || userId
+          }&page=${page}`;
     } else {
       return creationDate
         ? `/api/chat/user/${id}/messages?creationDate=${creationDate}`
@@ -70,16 +75,17 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   useEffect(() => {
     if (selectedUser) {
-      fetchMessages(selectedUser.id, null, 1, false);
+      fetchMessages(selectedUser.id, null, 1, true);
     }
   }, [newMessageTrigger]);
 
   useEffect(() => {
+    console.log("testign the loading after new messages");
     if (localSentMessage) {
       setMessages((prev) => [...prev, localSentMessage]);
 
       if (selectedUser && latestMessageDate) {
-        fetchMessages(selectedUser.id, latestMessageDate, undefined, false); // Fetch newer messages
+        fetchMessages(selectedUser.id, latestMessageDate, undefined, true);
       }
     }
   }, [localSentMessage]);
@@ -114,7 +120,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       const response = await ApiClient.get(endpoint);
 
       if (response.status === 200) {
-        const fetchedMessages = response.data.results.reverse(); // Oldest first
+        const fetchedMessages = response.data.results.reverse();
         if (page === 1 && !creationDate) {
           setMessages(fetchedMessages);
         } else if (creationDate) {

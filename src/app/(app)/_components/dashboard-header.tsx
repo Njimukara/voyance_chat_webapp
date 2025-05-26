@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, User as UserIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import ApiClient from "@/utils/axiosbase";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -38,7 +38,6 @@ const fetchAllSeers = async () => {
   try {
     const response = await ApiClient.get("/api/seers");
     if (response.status === 200) {
-      console.log(response.data.results);
       return response.data?.results;
     } else {
       throw new Error("Échec de la récupération des voyants");
@@ -55,6 +54,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedSeer, setSelectedSeer } = useSeer();
   const [pendingSeeker, setPendingSeeker] = useState<UserDTO | null>(null);
+  const { data: session } = useSession();
+  const userId: number | undefined = session?.user?.id;
 
   const handleSeekerClick = (seeker: UserDTO) => {
     setPendingSeeker(seeker);
@@ -66,26 +67,13 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       if (pendingSeeker) {
         setSelectedSeer(pendingSeeker);
       }
-      localStorage.setItem("selectedSeeker", JSON.stringify(pendingSeeker));
     }
     setPendingSeeker(null);
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    const stored = localStorage.getItem("selectedSeeker");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setSelectedSeer(parsed);
-      } catch (err) {
-        console.error("Error loading selectedSeeker from localStorage", err);
-      }
-    }
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("selectedSeeker");
+    localStorage.removeItem("selectedSeer");
     signOut({ callbackUrl: "/login" });
   };
 
@@ -114,20 +102,22 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             <div className="w-5 h-5 border-4 border-t-4 border-primary rounded-full animate-spin"></div>
           ) : (
             seers?.length > 0 &&
-            seers.map((seer: UserDTO) => (
-              <button
-                key={seer.id}
-                className={cn(
-                  "px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-colors",
-                  selectedSeer?.id === seer.id
-                    ? "bg-primary text-white border-primary"
-                    : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
-                )}
-                onClick={() => handleSeekerClick(seer)}
-              >
-                {seer.name}
-              </button>
-            ))
+            seers
+              .filter((seer: UserDTO) => seer.id !== userId)
+              .map((seer: UserDTO) => (
+                <button
+                  key={seer.id}
+                  className={cn(
+                    "px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-colors",
+                    selectedSeer?.id === seer.id
+                      ? "bg-primary text-white border-primary"
+                      : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
+                  )}
+                  onClick={() => handleSeekerClick(seer)}
+                >
+                  {seer.name}
+                </button>
+              ))
           )}
         </div>
       )}
