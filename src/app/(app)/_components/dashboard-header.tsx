@@ -36,7 +36,7 @@ interface DashboardHeaderProps {
 
 const fetchAllSeers = async () => {
   try {
-    const response = await ApiClient.get("/api/seers");
+    const response = await ApiClient.get("/api/seers/unread");
     if (response.status === 200) {
       return response.data?.results;
     } else {
@@ -56,7 +56,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const [pendingSeeker, setPendingSeeker] = useState<UserDTO | null>(null);
   const { data: session } = useSession();
   const userId: number | undefined = session?.user?.id;
-
   const handleSeekerClick = (seeker: UserDTO) => {
     setPendingSeeker(seeker);
     setIsModalOpen(true);
@@ -109,7 +108,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <button
                   key={seer.id}
                   className={cn(
-                    "px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-colors",
+                    "relative px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-colors",
                     selectedSeer?.id === seer.id
                       ? "bg-primary text-white border-primary"
                       : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
@@ -117,6 +116,9 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                   onClick={() => handleSeekerClick(seer)}
                 >
                   {seer.name}
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full">
+                    +1
+                  </span>
                 </button>
               ))
           )}
