@@ -83,8 +83,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   } = useQuery({
     queryKey: ["seers"],
     queryFn: fetchAllSeers,
-    staleTime: 1 * 60 * 1000,
-    refetchInterval: 1 * 60 * 1000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;

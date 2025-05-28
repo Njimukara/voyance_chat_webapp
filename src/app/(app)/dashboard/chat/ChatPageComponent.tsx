@@ -97,7 +97,6 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     try {
       const response = await ApiClient.get("/api/seers/");
       if (response.status === 200) {
-        console.log(response.data.results);
         return response.data?.results;
       } else {
         throw new Error("Échec de la récupération des voyants");
@@ -114,7 +113,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryKey: ["allSeers"],
     queryFn: fetchAllSeers,
     enabled: !!seerId,
-    staleTime: 3 * 60 * 1000,
+    staleTime: 60 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;
@@ -131,8 +130,8 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryKey: ["clients", selectedSeer?.id],
     queryFn: fetchClients,
     enabled: userType === "SEER" || userType == "CLIENT",
-    staleTime: 1 * 60 * 1000,
-    refetchInterval: 20 * 1000,
+    staleTime: 100 * 1000,
+    refetchInterval: 80 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;
@@ -214,7 +213,6 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
             };
 
       const actualSender = Number(selectedSeer?.user) ?? userId!;
-
       const tempMessage = {
         id: Date.now(), // Temporary unique ID
         sender: actualSender,
