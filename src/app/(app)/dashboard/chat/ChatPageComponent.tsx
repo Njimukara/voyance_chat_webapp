@@ -39,6 +39,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
+  const [isFromSeerList, setIsFromSeerList] = useState(false);
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -156,6 +157,8 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
         const selectedSeer = existingClient || newSeer;
         setIsNewClient(!existingClient && !!newSeer);
         setSelectedUser(selectedSeer);
+        setIsFromSeerList(!!newSeer && !existingClient);
+
         if (
           selectedSeer &&
           !updatedClients.some((c) => c.id === selectedSeer.id)
@@ -232,8 +235,11 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
 
       setLocalSentMessage(tempMessage);
 
+      const senderId =
+        isFromSeerList && seerId ? Number(seerId) : selectedUser.id;
+
       const response = await ApiClient.post(
-        sendMessageEndpoint(selectedUser.id),
+        sendMessageEndpoint(senderId),
         payload
       );
       if (
