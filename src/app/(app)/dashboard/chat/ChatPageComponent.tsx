@@ -130,8 +130,8 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     queryKey: ["clients", selectedSeer?.id],
     queryFn: fetchClients,
     enabled: userType === "SEER" || userType == "CLIENT",
-    staleTime: 100 * 1000,
-    refetchInterval: 80 * 1000,
+    staleTime: 60 * 1000,
+    refetchInterval: 20 * 1000,
     retry: (failureCount, error) => {
       if (axios.isAxiosError(error) && !error.response) {
         return false;
@@ -174,6 +174,16 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
       return;
     }
 
+    if (!userId) {
+      toast({
+        title: "Erreur Inattendue",
+        description:
+          "Aucun identifiant utilisateur détecté. Veuillez vous reconnecter pour continuer.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedUser) {
       toast({
         title: "Erreur Inattendue",
@@ -197,7 +207,8 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
         }
       }
 
-      const receiverId = seerId ? parseInt(seerId, 10) : selectedUser.id;
+      const seerUserId = Number(selectedSeer?.user);
+      const actualSender = !isNaN(seerUserId) ? seerUserId : userId!;
 
       const payload =
         userType === "SEER"
@@ -205,16 +216,15 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
               body: inputMessage,
               receiver: selectedUser.id,
               initialSender: initialSenderId,
-              sender: selectedSeer?.user || userId,
+              sender: actualSender,
             }
           : {
               body: inputMessage,
               sender: userId,
             };
 
-      const actualSender = Number(selectedSeer?.user) ?? userId!;
       const tempMessage = {
-        id: Date.now(), // Temporary unique ID
+        id: Date.now(),
         sender: actualSender,
         body: inputMessage,
         creation_date: new Date().toISOString(),
