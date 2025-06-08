@@ -43,7 +43,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   /* ─────────── notification-sound bookkeeping ─────────── */
   const playNotification = useNotificationSound();
-  const lastPlayedIdRef = useRef<number | null>(null);
+  const lastPlayedIdRef = useRef<string | number | null>(null);
   const firstLoadRef = useRef(true);
 
   const getMessagesEndpoint = (
@@ -80,7 +80,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [newMessageTrigger]);
 
   useEffect(() => {
-    // console.log("testign the loading after new messages");
     if (localSentMessage) {
       setMessages((prev) => [...prev, localSentMessage]);
 
@@ -122,31 +121,21 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
       if (response.status === 200) {
         const fetchedMessages = response.data.results.reverse();
-        if (page === 1 && !creationDate) {
-          setMessages(fetchedMessages);
-        } else if (creationDate) {
-          // Prepending older messages
-          setMessages((prev) => [...fetchedMessages, ...prev]);
-          setTimeout(() => {
-            if (scrollContainerRef.current) {
-              const newScrollHeight = scrollContainerRef.current.scrollHeight;
-              const scrollDifference =
-                newScrollHeight - previousScrollHeightRef.current;
-              scrollContainerRef.current.scrollTop = scrollDifference;
-            }
-          }, 0);
-        } else {
-          // Appending new messages
-          setMessages((prev) => [...prev, ...fetchedMessages]);
-          setTimeout(() => {
-            if (scrollContainerRef.current) {
-              const newScrollHeight = scrollContainerRef.current.scrollHeight;
-              const scrollDifference =
-                newScrollHeight - previousScrollHeightRef.current;
-              scrollContainerRef.current.scrollTop = scrollDifference;
-            }
-          }, 0);
-        }
+        console.log(fetchedMessages);
+        setMessages((prev) => {
+          // Remove temporary messages and deduplicate by id
+          const filtered = prev.filter((msg) => !msg.isTemporary);
+          const newMessages = fetchedMessages.filter(
+            (newMsg: Message) => !filtered.find((msg) => msg.id === newMsg.id)
+          );
+          if (page === 1 && !creationDate) {
+            return [...filtered, ...newMessages];
+          } else if (creationDate) {
+            return [...filtered, ...newMessages];
+          } else {
+            return [...filtered, ...newMessages];
+          }
+        });
 
         setNextUrl(response.data.next);
         setPreviousUrl(response.data.previous);
@@ -164,10 +153,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         }
       }
     } catch (error) {
-      // console.error("Error fetching messages", error);
+      console.error("Error fetching messages", error);
     } finally {
       setLoading(false);
-      if (!isPolling) setInitialLoading(false); // done loading if not polling
+      if (!isPolling) setInitialLoading(false);
       setIsLoadingOlder(false);
     }
   };
@@ -175,10 +164,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const previousScrollHeightRef = useRef<number>(0);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-
-  // useEffect(() => {
-  //   bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  // }, [messages]);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;

@@ -229,10 +229,11 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
             };
 
       const tempMessage = {
-        id: Date.now(),
+        id: `temp-${Date.now()}`,
         sender: actualSender,
         body: inputMessage,
         creation_date: new Date().toISOString(),
+        isTemporary: true,
       };
 
       setLocalSentMessage(tempMessage);

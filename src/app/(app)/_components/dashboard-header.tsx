@@ -98,10 +98,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     },
   });
 
-  useEffect(() => {
-    console.log(contextUser);
-  }, []);
-
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger className="sm:hidden" />
@@ -140,7 +136,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             {contextUser?.name ?? "Utilisateur"}
           </p>
 
-          {userType == "CLIENT" && user?.creditBalance !== undefined && (
+          {userType == "CLIENT" && contextUser?.creditBalance !== undefined && (
             <p className="text-xs text-muted-foreground">
               {contextUser?.creditBalance} crédits
             </p>

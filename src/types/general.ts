@@ -9,11 +9,12 @@ export interface AppUser {
 }
 
 export interface Message {
-  id: number;
+  id: string | number;
   sender: number;
   body: string;
   creation_date: string;
   reciever?: number;
+  isTemporary?: boolean;
 }
 
 export type UserDTO = {

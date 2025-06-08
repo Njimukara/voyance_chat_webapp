@@ -11,23 +11,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
   MessageSquare,
   Users,
-  ShoppingCart,
-  LogOut,
   User as UserIcon,
   CreditCard,
-  LayoutDashboard,
 } from "lucide-react";
 import { DashboardHeader } from "./_components/dashboard-header";
 import { SignOutButton } from "@/components/auth/signout-button"; // Import SignOutButton
-import { auth } from "@/lib/auth";
 import { AppUser, UserType } from "@/types/general";
 import { getUserRole } from "@/utils/apiConfig";
 import { UserProvider } from "@/lib/UserContext";
