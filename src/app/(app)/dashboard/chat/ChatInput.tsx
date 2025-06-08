@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { SendHorizonal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { UserType } from "@/types/general";
+import { SelectedUser, UserType } from "@/types/general";
+import { useEffect } from "react";
 
 interface ChatInputProps {
   newMessage: string;
@@ -12,6 +13,7 @@ interface ChatInputProps {
   onSendMessage: (message: string) => void;
   loading?: boolean;
   userType: UserType;
+  selectedUser: SelectedUser | null;
 }
 
 const MIN_WORD_COUNT = 10;
@@ -22,6 +24,7 @@ export function ChatInput({
   onSendMessage,
   loading,
   userType,
+  selectedUser,
 }: ChatInputProps) {
   const { toast } = useToast();
   const getWordCount = (text: string) =>
@@ -56,6 +59,10 @@ export function ChatInput({
       });
     }
   };
+
+  useEffect(() => {
+    setNewMessage("");
+  }, [selectedUser]);
 
   return (
     <form

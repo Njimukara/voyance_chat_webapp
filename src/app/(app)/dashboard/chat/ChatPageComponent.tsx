@@ -342,6 +342,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
                 setNewMessage={setInputMessage}
                 loading={loading}
                 userType={userType}
+                selectedUser={selectedUser}
               />
             </>
           )}
