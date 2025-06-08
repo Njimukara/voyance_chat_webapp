@@ -113,14 +113,14 @@ const BuyCreditsPage: React.FC = () => {
       setMessage(`Transaction complétée par ${session?.user?.name}`);
       setTimeout(() => {
         setSelectedPackage(null);
-      }, 3000);
+      }, 10000);
       setTimeout(() => {
         setMessage("");
-      }, 3000);
+      }, 10000);
 
       setTimeout(() => {
         router.push("/dashboard/chat");
-      }, 3000);
+      }, 10000);
       return response.data?.id || "";
     } catch (error: any) {
       const errorMessage =
