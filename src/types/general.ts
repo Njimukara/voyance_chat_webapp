@@ -1,3 +1,13 @@
+export interface AppUser {
+  user_profile: any;
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  role?: string | null;
+  creditBalance?: number;
+}
+
 export interface Message {
   id: number;
   sender: number;

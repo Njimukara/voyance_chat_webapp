@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import ConfirmPurchaseCreditModal from "@/components/ui/ConfirmPurchaseCreditModal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSeer } from "@/lib/SeerContext";
+import { useUser } from "@/lib/UserContext";
 
 interface ChatInterfaceProps {
   id?: string;
@@ -40,6 +41,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
   const [showModal, setShowModal] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
   const [isFromSeerList, setIsFromSeerList] = useState(false);
+  const { updateCreditBalance } = useUser();
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -271,6 +273,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
       const response = await ApiClient.get("/auth/users/me/");
       if (response.status === 200) {
         setCreditsLeft(response.data.creditBalance);
+        updateCreditBalance(response.data.creditBalance);
       }
     } catch (error) {}
   };

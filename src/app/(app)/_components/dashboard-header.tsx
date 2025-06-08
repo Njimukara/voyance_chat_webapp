@@ -17,11 +17,13 @@ import { signOut, useSession } from "next-auth/react";
 import ApiClient from "@/utils/axiosbase";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { UserDTO } from "@/types/general";
+import { UserDTO, UserType } from "@/types/general";
 import { useEffect, useState } from "react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { cn } from "@/lib/utils";
 import { useSeer } from "@/lib/SeerContext";
+import { useUser } from "@/lib/UserContext";
+import { getUserRole } from "@/utils/apiConfig";
 
 interface DashboardHeaderProps {
   user: {
@@ -54,12 +56,15 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedSeer, setSelectedSeer } = useSeer();
   const [pendingSeeker, setPendingSeeker] = useState<UserDTO | null>(null);
+  const { contextUser } = useUser();
   const { data: session } = useSession();
   const userId: number | undefined = session?.user?.id;
   const handleSeekerClick = (seeker: UserDTO) => {
     setPendingSeeker(seeker);
     setIsModalOpen(true);
   };
+
+  const userType: UserType = getUserRole(contextUser?.user_profile?.user_type);
 
   const handleConfirmSwitch = () => {
     if (pendingSeeker) {
@@ -92,6 +97,10 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       return failureCount < 2;
     },
   });
+
+  useEffect(() => {
+    console.log(contextUser);
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -127,11 +136,13 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       <div className="flex-1" />
       <div className="flex items-center gap-4 flex-grow-0">
         <div className="flex flex-col">
-          <p className="text-sm font-medium">{user?.name ?? "Utilisateur"}</p>
+          <p className="text-sm font-medium">
+            {contextUser?.name ?? "Utilisateur"}
+          </p>
 
-          {user?.isClient && user?.creditBalance !== undefined && (
+          {userType == "CLIENT" && user?.creditBalance !== undefined && (
             <p className="text-xs text-muted-foreground">
-              {user?.creditBalance} crédits
+              {contextUser?.creditBalance} crédits
             </p>
           )}
         </div>

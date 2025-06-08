@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react"; // ✨ Add useState and useMemo
+import { useState, useMemo, useEffect, useRef } from "react"; // ✨ Add useState and useMemo
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -22,12 +22,25 @@ export function ChatSidebar({
   error,
 }: ChatSidebarProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const hasSelectedFirstUser = useRef(false);
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
       user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
+
+  // Automatically select the first user on load if the list is not empty and no user is selected
+  useEffect(() => {
+    if (
+      filteredUsers.length > 0 &&
+      !selectedUser &&
+      !hasSelectedFirstUser.current
+    ) {
+      onSelectUser(filteredUsers[0]);
+      hasSelectedFirstUser.current = true;
+    }
+  }, [filteredUsers, selectedUser, onSelectUser]);
 
   return (
     <div className="w-full md:w-72 lg:w-72 border-r h-full flex flex-col">
