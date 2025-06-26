@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import ApiClient from "@/utils/axiosbase";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import {
@@ -88,8 +88,8 @@ export default function SuccesVerifyEmail({ providers }: any) {
             <CardContent className="flex flex-col items-center">
               <CheckCircleIcon className="h-36 w-36 text-green-500 animate-bounce" />
               <p className="text-2xl font-bold mt-4">Compte activé !</p>
-              <Button onClick={() => router.push("/register")}>
-                Renvoyer le lien d’activation Procéder à la connexion
+              <Button onClick={() => router.push("/login")}>
+                Procéder à la connexion
               </Button>
             </CardContent>
           </Card>

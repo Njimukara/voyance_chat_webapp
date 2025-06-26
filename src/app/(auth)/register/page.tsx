@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,27 +8,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Loader2 } from "lucide-react"; // Import Loader2
-import { signIn } from "next-auth/react"; // Import signIn for Google
-import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import ApiClient from "@/utils/axiosbase";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react"; // Import Loader2
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 // Define API URL (replace with environment variable in production)
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -38,6 +34,7 @@ const registerSchema = z
   .object({
     firstName: z.string().min(1, { message: "Le prenom est obligatoire" }),
     lastName: z.string().min(1, { message: "Le nom est obligatoire" }),
+    fullName: z.string().min(1, { message: "Le nom est obligatoire" }),
     email: z.string().email({ message: "Format d'email invalide" }),
     birth_date: z.string().refine(
       (date) => {
@@ -79,6 +76,7 @@ export default function RegisterPage() {
     defaultValues: {
       firstName: "",
       lastName: "",
+      fullName: "",
       email: "",
       birth_date: "",
       password: "",
@@ -87,7 +85,6 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    console.log("Form submitted with values:", values);
     const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
 
     const data = {
