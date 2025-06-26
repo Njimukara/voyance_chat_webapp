@@ -92,6 +92,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   useEffect(() => {
     if (!selectedUser) return;
+    setMessages([]);
+    fetchMessages(selectedUser.id, null, 1, false);
 
     const interval = setInterval(async () => {
       if (!isUserAtBottom()) {
@@ -121,7 +123,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
       if (response.status === 200) {
         const fetchedMessages = response.data.results.reverse();
-        console.log(fetchedMessages);
+        // console.log("testing", fetchedMessages);
         setMessages((prev) => {
           // Remove temporary messages and deduplicate by id
           const filtered = prev.filter((msg) => !msg.isTemporary);
@@ -194,7 +196,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       const response = await ApiClient.get(url);
 
       if (response.status === 200) {
-        const fetchedMessages = response.data.results.reverse(); // Oldest first
+        const fetchedMessages = response.data.results.reverse();
 
         if (mode === "prepend") {
           setMessages((prev) => [...fetchedMessages, ...prev]);
@@ -237,16 +239,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     if (!scrollContainerRef.current) return false;
     const { scrollTop, scrollHeight, clientHeight } =
       scrollContainerRef.current;
-    return scrollHeight - scrollTop - clientHeight < 100; // 100px tolerance
+    return scrollHeight - scrollTop - clientHeight < 100;
   };
 
-  /* ――― play sound when the OTHER user sends something new ――― */
   useEffect(() => {
     if (messages.length === 0) return;
 
     const latest = messages[messages.length - 1];
 
-    // Skip on first historical load
     if (firstLoadRef.current) {
       firstLoadRef.current = false;
       lastPlayedIdRef.current = latest.id;
