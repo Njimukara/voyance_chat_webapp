@@ -80,9 +80,17 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
 
   const fetchClients = async () => {
     try {
-      const response = await ApiClient.get(
-        `/api/chat/seer/customers?seer_id=${selectedSeer?.user || userId}`
-      );
+      let url = "";
+
+      if (userType === "SEER") {
+        url = `/api/chat/seer/all-unanswered-users`;
+      } else {
+        url = `/api/chat/seer/customers?seer_id=${
+          selectedSeer?.user || userId
+        }`;
+      }
+
+      const response = await ApiClient.get(url);
       if (response.status === 200) {
         return response.data?.results;
       } else {

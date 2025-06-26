@@ -38,7 +38,6 @@ const registerSchema = z
   .object({
     firstName: z.string().min(1, { message: "Le prenom est obligatoire" }),
     lastName: z.string().min(1, { message: "Le nom est obligatoire" }),
-    fullName: z.string().min(1, { message: "Le nom est obligatoire" }),
     email: z.string().email({ message: "Format d'email invalide" }),
     birth_date: z.string().refine(
       (date) => {
@@ -80,7 +79,6 @@ export default function RegisterPage() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      fullName: "",
       email: "",
       birth_date: "",
       password: "",
@@ -89,6 +87,7 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
+    console.log("Form submitted with values:", values);
     const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
 
     const data = {

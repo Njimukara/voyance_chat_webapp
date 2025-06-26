@@ -65,7 +65,7 @@ export default function SuccesVerifyEmail({ providers }: any) {
                 Activation du compte en cours...
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center items-center">
+            <CardContent className="mb-4 flex justify-center items-center">
               <div className="h-16 w-16 animate-spin rounded-full border-8 border-gray-300 border-t-blue-500"></div>
             </CardContent>
           </Card>
