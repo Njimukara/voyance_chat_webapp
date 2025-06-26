@@ -1,9 +1,10 @@
-import { useState, useMemo, useEffect, useRef } from "react"; // ✨ Add useState and useMemo
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"; // ✨ Add useState and useMemo
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { formatLastAction, UserDTO } from "@/types/general";
+import { useUser } from "@/lib/UserContext";
 
 interface ChatSidebarProps {
   users: UserDTO[];
@@ -23,6 +24,7 @@ export function ChatSidebar({
 }: ChatSidebarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const hasSelectedFirstUser = useRef(false);
+  const { setSelectedChatUser } = useUser();
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
@@ -30,17 +32,25 @@ export function ChatSidebar({
     );
   }, [users, searchTerm]);
 
-  // Automatically select the first user on load if the list is not empty and no user is selected
+  const handleUserSelection = useCallback(
+    (user: any) => {
+      // console.log("User selected in layout:", user);
+      onSelectUser(user);
+      setSelectedChatUser(user);
+    },
+    [onSelectUser]
+  );
+
   useEffect(() => {
     if (
       filteredUsers.length > 0 &&
       !selectedUser &&
       !hasSelectedFirstUser.current
     ) {
-      onSelectUser(filteredUsers[0]);
+      handleUserSelection(filteredUsers[0]);
       hasSelectedFirstUser.current = true;
     }
-  }, [filteredUsers, selectedUser, onSelectUser]);
+  }, [filteredUsers, selectedUser, handleUserSelection]);
 
   return (
     <div className="w-full md:w-72 lg:w-72 border-r h-full flex flex-col">
@@ -69,7 +79,7 @@ export function ChatSidebar({
               filteredUsers.map((user) => (
                 <div
                   key={user.id}
-                  onClick={() => onSelectUser(user)}
+                  onClick={() => handleUserSelection(user)}
                   className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition hover:bg-muted ${
                     selectedUser?.id === user.id ? "bg-muted" : ""
                   }`}

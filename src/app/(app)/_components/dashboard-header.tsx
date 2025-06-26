@@ -98,6 +98,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     },
   });
 
+  const { selectedChatUser } = useUser();
+
+  useEffect(() => {
+    if (!selectedChatUser) return;
+
+    const fetchClientDetails = async () => {
+      try {
+        // const response = await ApiClient.get(
+        //   `/api/client/${selectedChatUser.id}`
+        // );
+        console.log("Fetched client details:", selectedChatUser);
+        // Do something with the data, like updating state or context
+      } catch (error) {
+        console.error("Failed to fetch client details", error);
+      }
+    };
+
+    fetchClientDetails();
+  }, [selectedChatUser]);
+
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger className="sm:hidden" />
