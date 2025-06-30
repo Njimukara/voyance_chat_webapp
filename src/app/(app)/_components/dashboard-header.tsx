@@ -12,13 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Settings, LogOut, User as UserIcon } from "lucide-react";
+import { Settings, LogOut, User as UserIcon, Loader2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import ApiClient from "@/utils/axiosbase";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { UserDTO, UserType } from "@/types/general";
 import { useEffect, useState } from "react";
+import { UserDTO, UserType } from "@/types/general";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { cn } from "@/lib/utils";
 import { useSeer } from "@/lib/SeerContext";
@@ -36,82 +34,56 @@ interface DashboardHeaderProps {
   };
 }
 
-const fetchAllSeers = async () => {
-  try {
-    const response = await ApiClient.get("/api/seers/unread");
-    if (response.status === 200) {
-      return response.data?.results;
-    } else {
-      throw new Error("Échec de la récupération des voyants");
-    }
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.detail ||
-        "Une erreur est survenue lors de la récupération des voyants"
-    );
-  }
-};
-
 export function DashboardHeader({ user }: DashboardHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [seers, setSeers] = useState<UserDTO[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { selectedSeer, setSelectedSeer } = useSeer();
   const [pendingSeeker, setPendingSeeker] = useState<UserDTO | null>(null);
-  const { contextUser } = useUser();
+  const { contextUser, selectedChatUser } = useUser();
   const { data: session } = useSession();
-  const userId: number | undefined = session?.user?.id;
+  const userId = session?.user?.id;
+  const userType: UserType = getUserRole(contextUser?.user_profile?.user_type);
+
   const handleSeekerClick = (seeker: UserDTO) => {
     setPendingSeeker(seeker);
     setIsModalOpen(true);
   };
 
-  const userType: UserType = getUserRole(contextUser?.user_profile?.user_type);
-
   const handleConfirmSwitch = () => {
-    if (pendingSeeker) {
-      if (pendingSeeker) {
-        setSelectedSeer(pendingSeeker);
-      }
-    }
+    if (pendingSeeker) setSelectedSeer(pendingSeeker);
     setPendingSeeker(null);
     setIsModalOpen(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("selectedSeer");
-    signOut({ callbackUrl: "/login" });
+    document.body.classList.add("fade-out");
+
+    setTimeout(() => {
+      localStorage.removeItem("selectedSeer");
+      signOut({ callbackUrl: "/login" });
+    }, 300); // match animation duration
   };
-
-  const {
-    data: seers = [],
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["seers"],
-    queryFn: fetchAllSeers,
-    staleTime: 60 * 1000,
-    refetchInterval: 60 * 1000,
-    retry: (failureCount, error) => {
-      if (axios.isAxiosError(error) && !error.response) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-  });
-
-  const { selectedChatUser } = useUser();
 
   useEffect(() => {
     if (!selectedChatUser) return;
 
     const fetchClientDetails = async () => {
       try {
-        // const response = await ApiClient.get(
-        //   `/api/client/${selectedChatUser.id}`
-        // );
-        console.log("Fetched client details:", selectedChatUser);
-        // Do something with the data, like updating state or context
-      } catch (error) {
-        console.error("Failed to fetch client details", error);
+        setIsLoading(true);
+        setError(null);
+        const response = await ApiClient.get(
+          "/api/chat/seer/unresponsive-seers",
+          {
+            params: { customer_id: selectedChatUser.id },
+          }
+        );
+        setSeers(response.data.results || []);
+      } catch (err) {
+        setError("Impossible de charger les voyants. Veuillez réessayer.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -121,19 +93,21 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between h-14 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SidebarTrigger className="sm:hidden" />
-      {user?.isAdmin && seers.length > 0 && (
+
+      {user?.isAdmin && (
         <div className="flex items-center gap-2 ml-auto">
           {isLoading ? (
-            <div className="w-5 h-5 border-4 border-t-4 border-primary rounded-full animate-spin"></div>
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          ) : error ? (
+            <p className="text-sm text-red-500">{error}</p>
           ) : (
-            seers?.length > 0 &&
             seers
-              .filter((seer: UserDTO) => seer.id !== userId)
-              .map((seer: UserDTO) => (
+              .filter((seer) => seer.id !== userId)
+              .map((seer) => (
                 <button
                   key={seer.id}
                   className={cn(
-                    "relative px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-colors",
+                    "opacity-0 animate-fadeInSlow relative px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-all duration-300",
                     selectedSeer?.id === seer.id
                       ? "bg-primary text-white border-primary"
                       : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
@@ -149,18 +123,20 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           )}
         </div>
       )}
+
       <div className="flex-1" />
+
       <div className="flex items-center gap-4 flex-grow-0">
         <div className="flex flex-col">
           <p className="text-sm font-medium">
             {contextUser?.name ?? "Utilisateur"}
           </p>
-
-          {userType == "CLIENT" && contextUser?.creditBalance !== undefined && (
-            <p className="text-xs text-muted-foreground">
-              {contextUser?.creditBalance} crédits
-            </p>
-          )}
+          {userType === "CLIENT" &&
+            contextUser?.creditBalance !== undefined && (
+              <p className="text-xs text-muted-foreground">
+                {contextUser.creditBalance} crédits
+              </p>
+            )}
         </div>
 
         <DropdownMenu>
@@ -207,11 +183,10 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <ConfirmModal
         message={`Êtes-vous sûr de vouloir passer à ${pendingSeeker?.name} ?`}
-        onConfirm={() => {
-          handleConfirmSwitch();
-        }}
+        onConfirm={handleConfirmSwitch}
         onClose={() => {
           setPendingSeeker(null);
           setIsModalOpen(false);
