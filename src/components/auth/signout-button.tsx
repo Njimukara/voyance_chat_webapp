@@ -6,8 +6,13 @@ import { LogOut } from "lucide-react";
 import { SidebarMenuButton } from "@/components/ui/sidebar"; // Import SidebarMenuButton
 
 export function SignOutButton() {
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" }); // Redirect to homepage after sign out
+  const handleSignOut = () => {
+    document.body.classList.add("fade-out");
+
+    setTimeout(() => {
+      localStorage.removeItem("selectedSeer");
+      signOut({ callbackUrl: "/login" });
+    }, 300);
   };
 
   return (
