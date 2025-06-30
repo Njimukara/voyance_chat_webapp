@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { formatLastAction, UserDTO } from "@/types/general";
 import { useUser } from "@/lib/UserContext";
+import { useSeer } from "@/lib/SeerContext";
 
 interface ChatSidebarProps {
   users: UserDTO[];
@@ -25,6 +26,7 @@ export function ChatSidebar({
   const [searchTerm, setSearchTerm] = useState("");
   const hasSelectedFirstUser = useRef(false);
   const { setSelectedChatUser } = useUser();
+  const { selectedSeer } = useSeer();
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
@@ -50,7 +52,16 @@ export function ChatSidebar({
       handleUserSelection(filteredUsers[0]);
       hasSelectedFirstUser.current = true;
     }
-  }, [filteredUsers, selectedUser, handleUserSelection]);
+  }, [filteredUsers, selectedUser, selectedSeer, handleUserSelection]);
+
+  useEffect(() => {
+    if (selectedSeer && filteredUsers.length > 0) {
+      setTimeout(() => {
+        handleUserSelection(filteredUsers[0]);
+        hasSelectedFirstUser.current = true;
+      }, 0);
+    }
+  }, [selectedSeer, filteredUsers]);
 
   return (
     <div className="w-full md:w-72 lg:w-72 border-r h-full flex flex-col">
