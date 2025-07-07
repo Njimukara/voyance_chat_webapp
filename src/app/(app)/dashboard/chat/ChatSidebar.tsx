@@ -52,16 +52,16 @@ export function ChatSidebar({
       handleUserSelection(filteredUsers[0]);
       hasSelectedFirstUser.current = true;
     }
-  }, [filteredUsers, selectedUser, selectedSeer, handleUserSelection]);
+  }, [filteredUsers, selectedUser]);
 
-  useEffect(() => {
-    if (selectedSeer && filteredUsers.length > 0) {
-      setTimeout(() => {
-        handleUserSelection(filteredUsers[0]);
-        hasSelectedFirstUser.current = true;
-      }, 0);
-    }
-  }, [selectedSeer, filteredUsers]);
+  // useEffect(() => {
+  //   if (selectedSeer && filteredUsers.length > 0) {
+  //     setTimeout(() => {
+  //       handleUserSelection(filteredUsers[0]);
+  //       hasSelectedFirstUser.current = true;
+  //     }, 0);
+  //   }
+  // }, [selectedSeer, filteredUsers]);
 
   return (
     <div className="w-full md:w-72 lg:w-72 border-r h-full flex flex-col">
