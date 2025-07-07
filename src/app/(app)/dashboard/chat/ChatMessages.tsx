@@ -51,13 +51,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     creationDate?: string | null,
     page: number = 1
   ) => {
+    console.log(selectedSeer);
     if (userType === "SEER") {
       return creationDate
         ? `/api/chat/seer/messages?customer_id=${id}&seer_id=${
-            selectedSeer?.user || userId
+            selectedSeer?.id || userId
           }&creationDate=${creationDate}`
         : `/api/chat/seer/messages?customer_id=${id}&seer_id=${
-            selectedSeer?.user || userId
+            selectedSeer?.id || userId
           }&page=${page}`;
     } else {
       return creationDate
