@@ -169,6 +169,21 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <span>Profil</span>
               </Link>
             </DropdownMenuItem>
+            {selectedSeer && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setSelectedSeer(null);
+                  }}
+                  className="text-destructive cursor-pointer"
+                >
+                  <LogOut className="mr-2 h-4 w-4 text-destructive" />
+                  <span>Effacer le voyant</span>
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onSelect={(event) => {

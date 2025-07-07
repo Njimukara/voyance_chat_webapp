@@ -3,7 +3,7 @@ import { UserDTO } from "@/types/general";
 
 type SeerContextType = {
   selectedSeer: UserDTO | null;
-  setSelectedSeer: (seer: UserDTO) => void;
+  setSelectedSeer: (seer: UserDTO | null) => void;
 };
 
 const SeerContext = createContext<SeerContextType | undefined>(undefined);
@@ -22,8 +22,12 @@ export const SeerProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const updateSeer = (seer: UserDTO) => {
-    localStorage.setItem("selectedSeer", JSON.stringify(seer));
+  const updateSeer = (seer: UserDTO | null) => {
+    if (seer === null) {
+      localStorage.removeItem("selectedSeer");
+    } else {
+      localStorage.setItem("selectedSeer", JSON.stringify(seer));
+    }
     setSelectedSeer(seer);
   };
 
