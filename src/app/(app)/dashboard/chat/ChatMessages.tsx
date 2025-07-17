@@ -1,5 +1,4 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { Message, UserDTO, UserType } from "@/types/general";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +7,7 @@ import { formatDateForAPI } from "@/utils/apiConfig";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
 import { useSeer } from "@/lib/SeerContext";
 import { format } from "date-fns";
-import { formatDateDivider, formatMessageTime } from "@/utils/helperFunction";
+import { formatDateDivider, formatMessageTime } from "@/lib/utils";
 
 interface ChatMessagesProps {
   selectedUser: UserDTO | null;
@@ -145,7 +144,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
       if (response.status === 200) {
         const fetchedMessages = response.data.results.reverse();
-        // console.log("testing", fetchedMessages);
+        console.log("testing", fetchedMessages);
         setMessages((prev) => {
           // Remove temporary messages and deduplicate by id
           const filtered = prev.filter((msg) => !msg.isTemporary);
@@ -287,8 +286,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [messages, userId, playNotification]);
 
   useEffect(() => {
-    if (selectedSeer?.user != null) {
-      setCurrentSenderId(Number(selectedSeer.user));
+    if (selectedSeer?.id != null) {
+      setCurrentSenderId(Number(selectedSeer.id));
+      return;
     } else if (userId != null) {
       setCurrentSenderId(userId);
     }

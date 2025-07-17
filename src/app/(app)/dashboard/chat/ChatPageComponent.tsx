@@ -171,7 +171,7 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
 
     setLoading(true);
     try {
-      const seerUserId = Number(selectedSeer?.user);
+      const seerUserId = Number(selectedSeer?.id);
       const actualSender = !isNaN(seerUserId) ? seerUserId : userId!;
       const initialSenderId = selectedSeer?.id || 0;
 
