@@ -62,7 +62,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     creationDate?: string | null,
     page: number = 1
   ) => {
-    console.log(selectedSeer);
     if (userType === "SEER") {
       return creationDate
         ? `/api/chat/seer/messages?customer_id=${id}&seer_id=${
@@ -102,15 +101,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }, [localSentMessage]);
 
-  // useEffect(() => {
-  //   const controller = new AbortController();
-  //   if (selectedUser) {
-  //     fetchMessages(selectedUser.id, null, 1, false, controller.signal);
-  //   }
-
-  //   return () => controller.abort();
-  // }, [selectedUser]);
-
   useEffect(() => {
     if (!selectedUser) return;
     setMessages([]);
@@ -118,16 +108,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
     const interval = setInterval(async () => {
       if (!isUserAtBottom()) {
-        // If user is NOT at bottom, fetch messages but don't auto-scroll
         await fetchMessages(selectedUser.id, null, 1, true);
-        setHasNewMessages(true); // <-- show 'new messages' indicator
+        setHasNewMessages(true);
       } else {
-        // If user IS at bottom, fetch messages normally
         await fetchMessages(selectedUser.id, null, 1, true);
       }
-    }, 10000); // every 20 seconds
+    }, 10000);
 
-    return () => clearInterval(interval); // cleanup
+    return () => clearInterval(interval);
   }, [selectedUser]);
 
   const fetchMessages = async (
@@ -144,7 +132,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
       if (response.status === 200) {
         const fetchedMessages = response.data.results.reverse();
-        console.log("testing", fetchedMessages);
         setMessages((prev) => {
           // Remove temporary messages and deduplicate by id
           const filtered = prev.filter((msg) => !msg.isTemporary);

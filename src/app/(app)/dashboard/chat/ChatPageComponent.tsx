@@ -140,7 +140,10 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     const selected = existingClient || newSeer;
 
     setIsNewClient(!existingClient && !!newSeer);
-    setSelectedUser(selected);
+    if (!selectedUser || selected?.id !== selectedUser.id) {
+      setSelectedUser(selected);
+    }
+
     setIsFromSeerList(!!newSeer && !existingClient);
 
     if (selected && !updatedClients.some((c) => c.id === selected.id)) {

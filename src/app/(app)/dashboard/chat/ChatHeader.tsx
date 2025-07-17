@@ -30,7 +30,7 @@ export function ChatHeader({
   if (!selectedUser) return null;
 
   return (
-    <header className="flex items-center justify-between p-4 border-b bg-card">
+    <header className="w-full flex items-center justify-between p-4 border-b bg-card">
       {/* Left: Back or sidebar toggle + user info */}
       <div className="flex items-center gap-2">
         <button onClick={onBack} className="text-blue-500">
