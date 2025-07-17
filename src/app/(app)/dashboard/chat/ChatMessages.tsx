@@ -7,6 +7,8 @@ import ApiClient from "@/utils/axiosbase";
 import { formatDateForAPI } from "@/utils/apiConfig";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
 import { useSeer } from "@/lib/SeerContext";
+import { format } from "date-fns";
+import { formatDateDivider, formatMessageTime } from "@/utils/helperFunction";
 
 interface ChatMessagesProps {
   selectedUser: UserDTO | null;
@@ -16,6 +18,16 @@ interface ChatMessagesProps {
   userType: UserType;
   isNewClient: boolean;
 }
+const groupMessagesByDay = (messages: Message[]) => {
+  return messages.reduce((groups: Record<string, Message[]>, message) => {
+    const dateKey = format(new Date(message.creation_date), "yyyy-MM-dd");
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
+    groups[dateKey].push(message);
+    return groups;
+  }, {});
+};
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   selectedUser,
@@ -90,6 +102,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [localSentMessage]);
+
+  // useEffect(() => {
+  //   const controller = new AbortController();
+  //   if (selectedUser) {
+  //     fetchMessages(selectedUser.id, null, 1, false, controller.signal);
+  //   }
+
+  //   return () => controller.abort();
+  // }, [selectedUser]);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -299,33 +320,40 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             </div>
           )}
 
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex flex-col ${
-                message.sender === currentSenderId ? "items-end" : "items-start"
-              }`}
-            >
-              <div
-                className={`rounded-lg px-3 py-2 max-w-xs md:max-w-md break-words shadow-sm text-sm ${
-                  message.sender === currentSenderId
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {message.body}
-              </div>
+          {Object.entries(groupMessagesByDay(messages)).map(
+            ([dateKey, msgs]) => (
+              <div key={dateKey}>
+                <div className="text-center text-xs text-muted-foreground py-1 sticky top-0 bg-background/80 backdrop-blur z-10">
+                  {formatDateDivider(dateKey)}
+                </div>
 
-              <div className="mt-1 text-xs text-muted-foreground">
-                {message.creation_date
-                  ? new Date(message.creation_date).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "-"}
+                {msgs.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex flex-col my-1 ${
+                      message.sender === currentSenderId
+                        ? "items-end"
+                        : "items-start"
+                    }`}
+                  >
+                    <div
+                      className={`rounded-lg px-1 py-2 max-w-xs md:max-w-md break-words shadow-sm text-sm ${
+                        message.sender === currentSenderId
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {message.body}
+                    </div>
+
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {formatMessageTime(message.creation_date)}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          ))}
+            )
+          )}
         </>
       )}
       <div ref={bottomRef} />
