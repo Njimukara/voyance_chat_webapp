@@ -79,6 +79,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             params: { customer_id: selectedChatUser.id },
           }
         );
+        console.log("Fetched seers:", response.data.results);
         setSeers(response.data.results || []);
       } catch (err) {
         setError("Impossible de charger les voyants. Veuillez réessayer.");
@@ -102,7 +103,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             <p className="text-sm text-red-500">{error}</p>
           ) : (
             seers
-              .filter((seer) => seer.id !== userId)
+              // .filter((seer) => seer.id !== userId)
               .map((seer) => (
                 <button
                   key={seer.id}
