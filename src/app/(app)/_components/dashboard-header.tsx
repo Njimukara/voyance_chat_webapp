@@ -79,7 +79,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             params: { customer_id: selectedChatUser.id },
           }
         );
-        console.log("Fetched seers:", response.data.results);
         setSeers(response.data.results || []);
       } catch (err) {
         setError("Impossible de charger les voyants. Veuillez réessayer.");
@@ -102,25 +101,23 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           ) : error ? (
             <p className="text-sm text-red-500">{error}</p>
           ) : (
-            seers
-              // .filter((seer) => seer.id !== userId)
-              .map((seer) => (
-                <button
-                  key={seer.id}
-                  className={cn(
-                    "opacity-0 animate-fadeInSlow relative px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-all duration-300",
-                    selectedSeer?.id === seer.id
-                      ? "bg-primary text-white border-primary"
-                      : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
-                  )}
-                  onClick={() => handleSeekerClick(seer)}
-                >
-                  {seer.name}
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full">
-                    +1
-                  </span>
-                </button>
-              ))
+            seers.map((seer) => (
+              <button
+                key={seer.id}
+                className={cn(
+                  "opacity-0 animate-fadeInSlow relative px-4 capitalize py-2 text-sm font-medium rounded-full border-2 transition-all duration-300",
+                  selectedSeer?.id === seer.id
+                    ? "bg-primary text-white border-primary"
+                    : "text-muted-foreground bg-background hover:bg-primary hover:text-white"
+                )}
+                onClick={() => handleSeekerClick(seer)}
+              >
+                {seer.name}
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-1 py-0.5 rounded-full">
+                  +1
+                </span>
+              </button>
+            ))
           )}
         </div>
       )}

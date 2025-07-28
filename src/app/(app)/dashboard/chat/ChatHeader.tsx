@@ -33,10 +33,11 @@ export function ChatHeader({
     <header className="w-full flex items-center justify-between p-4 border-b bg-card">
       {/* Left: Back or sidebar toggle + user info */}
       <div className="flex items-center gap-2">
-        <button onClick={onBack} className="text-blue-500">
-          <ArrowLeft />
-        </button>
-
+        {isMobile && (
+          <button onClick={onBack} className="text-blue-500">
+            <ArrowLeft />
+          </button>
+        )}
         <Avatar>
           <AvatarImage
             src={selectedUser.avatar || ""}

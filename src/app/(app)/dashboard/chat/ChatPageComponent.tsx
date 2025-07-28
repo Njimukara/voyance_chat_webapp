@@ -68,10 +68,6 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     fetchUpdatedUserDetails();
   }, []);
 
-  useEffect(() => {
-    setSelectedUser(null);
-  }, [selectedSeer]);
-
   const fetchClients = async () => {
     try {
       const url =
@@ -140,9 +136,9 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
     const selected = existingClient || newSeer;
 
     setIsNewClient(!existingClient && !!newSeer);
-    if (!selectedUser || selected?.id !== selectedUser.id) {
-      setSelectedUser(selected);
-    }
+    // if (!selectedUser || selected?.id !== selectedUser.id) {
+    //   setSelectedUser(selected);
+    // }
 
     setIsFromSeerList(!!newSeer && !existingClient);
 

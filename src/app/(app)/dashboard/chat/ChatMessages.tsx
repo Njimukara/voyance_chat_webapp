@@ -6,7 +6,7 @@ import ApiClient from "@/utils/axiosbase";
 import { formatDateForAPI } from "@/utils/apiConfig";
 import { useNotificationSound } from "@/hooks/useNotificationSound";
 import { useSeer } from "@/lib/SeerContext";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { formatDateDivider, formatMessageTime } from "@/lib/utils";
 
 interface ChatMessagesProps {
@@ -38,6 +38,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadTimes, setLoadTimes] = useState(0);
   const [initialLoading, setInitialLoading] = useState(false);
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
@@ -281,6 +282,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }, [selectedSeer, userId]);
 
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    if (loadTimes < 0 || isUserAtBottom()) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      setLoadTimes((prev) => prev + 1);
+    }
+  }, [messages.length]);
+
   return (
     <ScrollArea
       ref={scrollContainerRef}
@@ -343,6 +353,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           )}
         </>
       )}
+
       <div ref={bottomRef} />
     </ScrollArea>
   );

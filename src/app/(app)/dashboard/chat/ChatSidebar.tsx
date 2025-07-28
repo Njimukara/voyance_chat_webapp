@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
 import { formatLastAction, UserDTO } from "@/types/general";
 import { useUser } from "@/lib/UserContext";
-import { useSeer } from "@/lib/SeerContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ChatSidebarProps {
   users: UserDTO[];
@@ -26,7 +26,7 @@ export function ChatSidebar({
   const [searchTerm, setSearchTerm] = useState("");
   const hasSelectedFirstUser = useRef(false);
   const { setSelectedChatUser } = useUser();
-  const { selectedSeer } = useSeer();
+  const isMobile = useIsMobile();
 
   const filteredUsers = useMemo(() => {
     return users.filter((user) =>
@@ -36,32 +36,30 @@ export function ChatSidebar({
 
   const handleUserSelection = useCallback(
     (user: any) => {
-      // console.log("User selected in layout:", user);
       onSelectUser(user);
       setSelectedChatUser(user);
     },
     [onSelectUser]
   );
 
+  console.log("selectedUser Users:", selectedUser);
+  console.log("Filtered Users:", filteredUsers);
+  console.log("isMobile :", isMobile);
+  console.log("hasSelectedFirstUser Users:", hasSelectedFirstUser);
+
   useEffect(() => {
-    if (
-      filteredUsers.length > 0 &&
-      !selectedUser &&
-      !hasSelectedFirstUser.current
-    ) {
+    if (filteredUsers.length > 0 && !hasSelectedFirstUser.current) {
       handleUserSelection(filteredUsers[0]);
       hasSelectedFirstUser.current = true;
+    } else {
+      handleUserSelection(null);
+      hasSelectedFirstUser.current = false;
     }
-  }, [filteredUsers, selectedUser]);
+  }, [filteredUsers]);
 
-  // useEffect(() => {
-  //   if (selectedSeer && filteredUsers.length > 0) {
-  //     setTimeout(() => {
-  //       handleUserSelection(filteredUsers[0]);
-  //       hasSelectedFirstUser.current = true;
-  //     }, 0);
-  //   }
-  // }, [selectedSeer, filteredUsers]);
+  if (isMobile === null) {
+    return null; // or loading placeholder
+  }
 
   return (
     <div className="w-full md:w-72 lg:w-72 border-r h-full flex flex-col">
