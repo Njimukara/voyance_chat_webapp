@@ -29,12 +29,14 @@ import * as z from "zod";
 
 // Define API URL (replace with environment variable in production)
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
+function capitalize(str: string) {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
 const registerSchema = z
   .object({
     firstName: z.string().min(1, { message: "Le prenom est obligatoire" }),
     lastName: z.string().min(1, { message: "Le nom est obligatoire" }),
-    fullName: z.string().min(1, { message: "Le nom est obligatoire" }),
+    fullName: z.string(),
     email: z.string().email({ message: "Format d'email invalide" }),
     birth_date: z.string().refine(
       (date) => {
@@ -85,7 +87,9 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    const fullName = `${values.firstName.trim()} ${values.lastName.trim()}`;
+    const fullName = `${capitalize(values.firstName.trim())} ${capitalize(
+      values.lastName.trim()
+    )}`;
 
     const data = {
       name: fullName,
@@ -96,7 +100,6 @@ export default function RegisterPage() {
       password: values.password,
       re_password: values.password,
     };
-
     try {
       setIsLoading(true);
       const res = await ApiClient.post(`/auth/users/`, data);
