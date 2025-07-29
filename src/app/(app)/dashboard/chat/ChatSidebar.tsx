@@ -42,13 +42,17 @@ export function ChatSidebar({
     [onSelectUser]
   );
 
-  console.log("selectedUser Users:", selectedUser);
-  console.log("Filtered Users:", filteredUsers);
-  console.log("isMobile :", isMobile);
-  console.log("hasSelectedFirstUser Users:", hasSelectedFirstUser);
+  // console.log("selectedUser Users:", selectedUser);
+  // // console.log("Filtered Users:", filteredUsers);
+  // console.log("isMobile :", isMobile);
+  // console.log("hasSelectedFirstUser Users:", hasSelectedFirstUser);
 
   useEffect(() => {
-    if (filteredUsers.length > 0 && !hasSelectedFirstUser.current) {
+    if (
+      filteredUsers.length > 0 &&
+      hasSelectedFirstUser.current == false &&
+      isMobile == false
+    ) {
       handleUserSelection(filteredUsers[0]);
       hasSelectedFirstUser.current = true;
     } else {

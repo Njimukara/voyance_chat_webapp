@@ -220,7 +220,6 @@ const ChatPageComponent: React.FC<ChatInterfaceProps> = ({ id }) => {
   };
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-
   return (
     <div className="flex h-full w-full relative">
       {!isMobile && (

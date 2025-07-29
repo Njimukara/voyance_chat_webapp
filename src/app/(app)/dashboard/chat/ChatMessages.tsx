@@ -18,7 +18,12 @@ interface ChatMessagesProps {
   isNewClient: boolean;
 }
 const groupMessagesByDay = (messages: Message[]) => {
-  return messages.reduce((groups: Record<string, Message[]>, message) => {
+  const sortedMessages = [...messages].sort(
+    (a, b) =>
+      new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime()
+  );
+
+  return sortedMessages.reduce((groups: Record<string, Message[]>, message) => {
     const dateKey = format(new Date(message.creation_date), "yyyy-MM-dd");
     if (!groups[dateKey]) {
       groups[dateKey] = [];
