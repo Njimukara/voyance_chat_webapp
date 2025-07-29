@@ -62,6 +62,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const playNotification = useNotificationSound();
   const lastPlayedIdRef = useRef<string | number | null>(null);
   const firstLoadRef = useRef(true);
+  const lastSenderRef = useRef<number | null>(null);
+  /* ────────────────────────────────────────────────────── */
 
   const getMessagesEndpoint = (
     id: number,
@@ -256,27 +258,65 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     return scrollHeight - scrollTop - clientHeight < 100;
   };
 
-  useEffect(() => {
-    if (messages.length === 0) return;
+  const latestMessage = messages[messages.length - 1];
 
-    const latest = messages[messages.length - 1];
+  useEffect(() => {
+    if (!latestMessage) return;
 
     if (firstLoadRef.current) {
       firstLoadRef.current = false;
-      lastPlayedIdRef.current = latest.id;
+      lastPlayedIdRef.current = latestMessage.id;
       return;
     }
 
-    // Only notify if it's NOT you and we haven't played this one yet
-    if (
-      latest.sender !== currentSenderId &&
-      latest.id !== lastPlayedIdRef.current &&
-      (selectedUser?.unread_message_count ?? 0) > 0
-    ) {
+    const isFromOtherUser = latestMessage.sender !== userId;
+    const isNew = latestMessage.id !== lastPlayedIdRef.current;
+    const isUnread = (selectedUser?.unread_message_count ?? 0) > 0;
+
+    if (isFromOtherUser && isNew && isUnread) {
       playNotification();
-      lastPlayedIdRef.current = latest.id;
+      lastPlayedIdRef.current = latestMessage.id;
     }
-  }, [messages, userId, playNotification]);
+  }, [
+    latestMessage?.id,
+    latestMessage?.sender,
+    userId,
+    selectedUser?.unread_message_count,
+    playNotification,
+  ]);
+
+  // useEffect(() => {
+  //   if (messages.length === 0) return;
+
+  //   const latest = messages[messages.length - 1];
+
+  //   if (firstLoadRef.current) {
+  //     firstLoadRef.current = false;
+  //     lastPlayedIdRef.current = latest.id;
+  //     lastSenderRef.current = latest.sender;
+  //     return;
+  //   }
+
+  //   const isFromOtherUser = latest.sender !== userId; // userId = current user
+  //   const isNewMessage = latest.id !== lastPlayedIdRef.current;
+  //   const senderChanged = latest.sender !== lastSenderRef.current;
+
+  //   const isUnread = (selectedUser?.unread_message_count ?? 0) > 0;
+
+  //   console.log({
+  //     latest,
+  //     isFromOtherUser,
+  //     isNewMessage,
+  //     senderChanged,
+  //     isUnread,
+  //   });
+
+  //   if (isFromOtherUser && isNewMessage && senderChanged && isUnread) {
+  //     playNotification();
+  //     lastPlayedIdRef.current = latest.id;
+  //     lastSenderRef.current = latest.sender;
+  //   }
+  // }, [messages, userId, selectedUser, playNotification]);
 
   useEffect(() => {
     if (selectedSeer?.id != null) {
